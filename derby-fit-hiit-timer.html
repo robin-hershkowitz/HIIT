@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Derby.Fit</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e0f;
+    --surface: #1a1a1c;
+    --surface2: #242426;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8;
+    --muted: #7a7875;
+    --work: #c8f55a;
+    --work-dim: rgba(200,245,90,0.12);
+    --rest: #f5a623;
+    --rest-dim: rgba(245,166,35,0.12);
+    --break: #5ab4f5;
+    --break-dim: rgba(90,180,245,0.12);
+    --done: #a78bfa;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container { width: 100%; max-width: 480px; }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .title span { color: var(--work); }
+
+  .sound-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .sound-toggle input { display: none; }
+  .toggle-pill {
+    width: 32px; height: 18px;
+    background: var(--surface2);
+    border-radius: 9px;
+    position: relative;
+    border: 1px solid var(--border2);
+    transition: background 0.2s;
+  }
+  .toggle-pill::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: left 0.2s, background 0.2s;
+  }
+  .sound-toggle input:checked + .toggle-pill { background: var(--work-dim); border-color: var(--work); }
+  .sound-toggle input:checked + .toggle-pill::after { left: 17px; background: var(--work); }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+  }
+
+  .stat-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .stat-val   { font-size: 20px; font-weight: 500; color: var(--text); }
+
+  .circuit-dots {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+    align-items: center;
+  }
+  .circuit-dots .label { font-size: 11px; color: var(--muted); margin-right: 4px; letter-spacing: 0.06em; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); transition: all 0.3s; }
+  .dot.active { background: var(--work); border-color: var(--work); box-shadow: 0 0 8px rgba(200,245,90,0.5); }
+  .dot.done   { background: var(--muted); border-color: var(--muted); }
+
+  .main-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .main-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--phase-color, var(--work));
+    transition: background 0.4s;
+  }
+
+  .phase-pill {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s;
+  }
+
+  .ex-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+  .tag {
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    background: var(--surface2);
+  }
+
+  .progress-wrap {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-bottom: 0.4rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--phase-color, var(--work));
+    transition: width 0.5s linear, background 0.4s;
+  }
+
+  .countdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+  }
+
+  .countdown {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  .next-label { font-size: 11px; color: var(--muted); text-align: right; max-width: 180px; line-height: 1.4; }
+
+  .tip {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    border-left: 2px solid var(--border2);
+    padding-left: 10px;
+  }
+
+  .controls { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 1.5rem; }
+
+  button {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  button:hover { background: var(--surface2); border-color: rgba(255,255,255,0.2); }
+  button:active { transform: scale(0.97); }
+
+  #btn-start {
+    background: var(--work-dim);
+    border-color: var(--work);
+    color: var(--work);
+  }
+  #btn-start:hover { background: rgba(200,245,90,0.2); }
+
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 1.5rem;
+  }
+
+  .legend-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 11px;
+  }
+
+  .legend-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
+
+  details { margin-top: 0.5rem; }
+  summary {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    padding: 0.5rem 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: '▸'; font-size: 10px; transition: transform 0.2s; }
+  details[open] summary::before { transform: rotate(90deg); }
+
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-num { color: var(--muted); min-width: 20px; font-size: 11px; }
+
+  .done-screen {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+  .done-screen .trophy {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 4rem;
+    color: var(--work);
+    margin-bottom: 1rem;
+  }
+  .done-screen h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+  .done-screen p { color: var(--muted); font-size: 13px; margin-bottom: 1.5rem; }
+  .done-screen button { margin: 0 auto; max-width: 260px; }
+
+  @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .flash { animation: flash 0.3s ease; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="title">Derby<span>.</span>Fit</div>
+    <label class="sound-toggle">
+      <input type="checkbox" id="sound-toggle" checked>
+      <span class="toggle-pill"></span>
+      <span id="sound-label">sound on</span>
+    </label>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Circuit</div><div class="stat-val" id="stat-circuit">1/3</div></div>
+    <div class="stat"><div class="stat-label">Exercise</div><div class="stat-val" id="stat-ex">1/10</div></div>
+    <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-val" id="stat-time">0:00</div></div>
+  </div>
+
+  <div class="circuit-dots">
+    <span class="label">CIRCUITS</span>
+    <div id="circuit-dots"></div>
+  </div>
+
+  <div class="main-card" id="main-card">
+    <div class="phase-pill" id="phase-pill" style="background:rgba(200,245,90,0.12);color:#c8f55a;border:1px solid rgba(200,245,90,0.3);">READY</div>
+    <div class="ex-name" id="ex-name">Fast grapevine</div>
+    <div class="tags" id="tags"></div>
+    <div class="countdown-row">
+      <div class="countdown" id="countdown" style="color:#c8f55a;">40</div>
+      <div class="next-label" id="next-label"></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:100%;"></div></div>
+    <div style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:0.75rem;" id="phase-sub">40s work · 20s rest</div>
+    <div class="tip" id="tip">Lead both directions — 20s each side. Stay light on your feet.</div>
+  </div>
+
+  <div class="controls">
+    <button id="btn-start" onclick="startPause()">▶ &nbsp;Start</button>
+    <button onclick="resetAll()">↺ &nbsp;Reset</button>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#c8f55a;"></span>Work 40s</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f5a623;"></span>Rest 20s</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#5ab4f5;"></span>Break 60s</div>
+  </div>
+
+  <details>
+    <summary>all exercises</summary>
+    <div id="full-list"></div>
+  </details>
+</div>
+
+<script>
+// ── Exercise list ─────────────────────────────────────────────────────────────
+// 10 exercises, balanced across: cardio, stretch, core, coordination, hip, weights
+const exercises = [
+  {
+    name: "Fast grapevine",
+    tags: ["cardio","coord"],
+    tip: "Lead both directions — 20s each side. Push off the trailing foot, stay low. This builds your lateral edge control on skates."
+  },
+  {
+    name: "Curtsy squats",
+    tags: ["hip","coord"],
+    tip: "Step back and across your body. Keep the front knee stacked over your toes. Builds the hip rotation you need for crossovers."
+  },
+  {
+    name: "Bicep curl + overhead press",
+    tags: ["weights"],
+    tip: "2 lb weights. Full curl, then press straight overhead. Slow on the way down. Control builds more than speed here."
+  },
+  {
+    name: "Side shuffles",
+    tags: ["cardio","coord"],
+    tip: "Stay low — chest up, slight bend in the knees the whole time. Push hard off the outside foot and keep your hips square."
+  },
+  {
+    name: "Fire hydrants",
+    tags: ["hip"],
+    tip: "On all fours, lift one knee out to the side to hip height. Keep your hips level — no rocking. Alternate sides or do 20s each."
+  },
+  {
+    name: "High knees",
+    tags: ["cardio","coord"],
+    tip: "Drive knees to hip height and pump your arms in rhythm. Engages the quick-step footwork you need for fast derby direction changes."
+  },
+  {
+    name: "Plank with runners",
+    tags: ["core","coord"],
+    tip: "Plank position — alternate driving each knee toward your chest in a controlled jog. Keep hips level and core braced throughout."
+  },
+  {
+    name: "Dead lifts",
+    tags: ["weights","hip"],
+    tip: "2 lb weights. Hinge at the hips, keep your back flat and shoulders back. Squeeze glutes as you stand. Builds the low-stance power derby demands."
+  },
+  {
+    name: "One foot balance",
+    tags: ["coord","stretch"],
+    tip: "Spend more time on your left foot — that's your weaker side. Micro-bend in the knee, soft gaze. Add a small side-body stretch overhead if steady."
+  },
+  {
+    name: "Tree pose + side stretch",
+    tags: ["stretch","coord"],
+    tip: "Foot to calf or inner thigh — never the knee. Once balanced, reach the arm overhead and arc gently to the side. Cool down your hips and restore your breath."
+  },
+];
+
+// ── Tag styling ───────────────────────────────────────────────────────────────
+const tagColors = {
+  cardio:  { bg:"rgba(245,166,35,0.12)",  color:"#f5a623", border:"rgba(245,166,35,0.3)"  },
+  core:    { bg:"rgba(90,180,245,0.12)",  color:"#5ab4f5", border:"rgba(90,180,245,0.3)"  },
+  coord:   { bg:"rgba(167,139,250,0.12)", color:"#a78bfa", border:"rgba(167,139,250,0.3)" },
+  hip:     { bg:"rgba(90,245,180,0.12)",  color:"#5af5b4", border:"rgba(90,245,180,0.3)"  },
+  stretch: { bg:"rgba(200,245,90,0.12)",  color:"#c8f55a", border:"rgba(200,245,90,0.3)"  },
+  weights: { bg:"rgba(245,90,90,0.12)",   color:"#f55a5a", border:"rgba(245,90,90,0.3)"   },
+};
+const tagLabel = {
+  cardio:"Cardio", core:"Core", coord:"Coordination",
+  hip:"Hip/glutes", stretch:"Stretch", weights:"2 lb weights"
+};
+
+const phaseColors = { work:"#c8f55a", rest:"#f5a623", break:"#5ab4f5", idle:"#c8f55a" };
+
+// ── Config ────────────────────────────────────────────────────────────────────
+const WORK=40, REST=20, BREAK=60, CIRCUITS=3;
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let circuit=0, exIdx=0, phase="idle", remaining=WORK, totalElapsed=0;
+let timerInt=null, started=false;
+let audioCtx=null;
+
+// ── Audio ─────────────────────────────────────────────────────────────────────
+function getAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+
+function beep(freq,dur,vol,delay){
+  try {
+    const ctx=getAudio(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type="sine"; o.frequency.value=freq;
+    const t=ctx.currentTime+delay;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.01);
+    g.gain.linearRampToValueAtTime(0,t+dur);
+    o.start(t); o.stop(t+dur+0.05);
+  } catch(e){}
+}
+
+function playSound(type){
+  if(!document.getElementById("sound-toggle").checked) return;
+  if(type==="work")  { beep(880,0.12,0.35,0); beep(1100,0.18,0.35,0.15); }
+  if(type==="rest")  { beep(660,0.18,0.25,0); }
+  if(type==="break") { beep(440,0.15,0.25,0); beep(440,0.15,0.25,0.2); beep(440,0.15,0.25,0.4); }
+  if(type==="warn")  { beep(880,0.08,0.2,0); beep(880,0.08,0.2,0.15); beep(880,0.08,0.2,0.3); }
+  if(type==="done")  { [0,0.18,0.36,0.56].forEach((d,i)=>beep([880,1100,1320,1760][i],0.2,0.3,d)); }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function fmt(s){ return Math.floor(s/60)+":"+(s%60<10?"0":"")+s%60; }
+
+function tags2html(tags){
+  return tags.map(t=>{
+    const c=tagColors[t]||{bg:"",color:"#888",border:"#888"};
+    return `<span class="tag" style="background:${c.bg};color:${c.color};border-color:${c.border};">${tagLabel[t]||t}</span>`;
+  }).join("");
+}
+
+function setPhaseColor(color){
+  document.documentElement.style.setProperty("--phase-color", color);
+}
+
+// ── UI update ─────────────────────────────────────────────────────────────────
+function updateUI(){
+  const ex=exercises[exIdx];
+  const isBreak=phase==="break";
+  const color=phaseColors[phase]||phaseColors.idle;
+
+  setPhaseColor(color);
+
+  document.getElementById("ex-name").textContent = isBreak ? "Circuit break" : ex.name;
+  document.getElementById("tags").innerHTML       = isBreak
+    ? `<span class="tag" style="background:rgba(90,180,245,0.12);color:#5ab4f5;border-color:rgba(90,180,245,0.3);">1 minute rest</span>`
+    : tags2html(ex.tags);
+  document.getElementById("tip").textContent      = isBreak
+    ? "Catch your breath. Shake out your legs. Hydrate before the next circuit."
+    : ex.tip;
+
+  const total = phase==="work"?WORK : phase==="rest"?REST : BREAK;
+  const pct   = Math.round(remaining/total*100);
+
+  document.getElementById("countdown").textContent = remaining;
+  document.getElementById("countdown").style.color = color;
+  document.getElementById("progress-fill").style.width = pct+"%";
+
+  const phaseLabel = phase==="work"?"WORK":phase==="rest"?"REST":phase==="break"?"BREAK":"READY";
+  const pill = document.getElementById("phase-pill");
+  pill.textContent = phaseLabel;
+  pill.style.background = `${color}1e`;
+  pill.style.color = color;
+  pill.style.borderColor = `${color}4d`;
+
+  document.getElementById("stat-circuit").textContent = (circuit+1)+"/"+CIRCUITS;
+  document.getElementById("stat-ex").textContent      = (exIdx+1)+"/10";
+  document.getElementById("stat-time").textContent    = fmt(totalElapsed);
+
+  const dc = document.getElementById("circuit-dots");
+  dc.innerHTML = "";
+  for(let i=0;i<CIRCUITS;i++){
+    const d=document.createElement("div"); d.className="dot";
+    if(i<circuit) d.classList.add("done"); else if(i===circuit) d.classList.add("active");
+    dc.appendChild(d);
+  }
+  dc.style.display="flex"; dc.style.gap="6px";
+
+  let next="";
+  if(phase==="work") next="next → 20s rest";
+  else if(phase==="rest"){
+    const ni=exIdx+1;
+    if(ni<exercises.length)   next="next → "+exercises[ni].name;
+    else if(circuit+1<CIRCUITS) next="next → circuit break";
+    else                        next="next → done!";
+  } else if(phase==="break") next="next → "+exercises[0].name;
+  document.getElementById("next-label").textContent = next;
+}
+
+// ── Timer logic ───────────────────────────────────────────────────────────────
+function advance(){
+  if(phase==="work"){
+    phase="rest"; remaining=REST; playSound("rest");
+  } else if(phase==="rest"){
+    exIdx++;
+    if(exIdx>=exercises.length){
+      exIdx=0; circuit++;
+      if(circuit>=CIRCUITS){ endWorkout(); return; }
+      phase="break"; remaining=BREAK; playSound("break");
+    } else {
+      phase="work"; remaining=WORK; playSound("work");
+    }
+  } else if(phase==="break"){
+    phase="work"; remaining=WORK; playSound("work");
+  }
+  updateUI();
+}
+
+function tick(){
+  remaining--; totalElapsed++;
+  if(remaining===3) playSound("warn");
+  if(remaining<=0)  advance();
+  else              updateUI();
+}
+
+function endWorkout(){
+  clearInterval(timerInt); playSound("done");
+  document.querySelector(".container").innerHTML=`
+    <div class="done-screen">
+      <div class="trophy">✦</div>
+      <h2>Workout complete</h2>
+      <p>3 circuits &nbsp;·&nbsp; 30 exercises &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
+      <button onclick="location.reload()" style="max-width:200px;">↺ &nbsp;Start over</button>
+    </div>`;
+}
+
+function startPause(){
+  if(!started){
+    started=true; phase="work"; remaining=WORK;
+    document.getElementById("btn-start").innerHTML="⏸ &nbsp;Pause";
+    document.getElementById("btn-start").style.background="rgba(200,245,90,0.08)";
+    playSound("work"); updateUI();
+    timerInt=setInterval(tick,1000);
+  } else if(timerInt){
+    clearInterval(timerInt); timerInt=null;
+    document.getElementById("btn-start").innerHTML="▶ &nbsp;Resume";
+  } else {
+    timerInt=setInterval(tick,1000);
+    document.getElementById("btn-start").innerHTML="⏸ &nbsp;Pause";
+  }
+}
+
+function resetAll(){
+  clearInterval(timerInt); timerInt=null; started=false;
+  circuit=0; exIdx=0; phase="idle"; remaining=WORK; totalElapsed=0;
+  document.getElementById("btn-start").innerHTML="▶ &nbsp;Start";
+  document.getElementById("btn-start").style.background="var(--work-dim)";
+  setPhaseColor("#c8f55a");
+  updateUI();
+  document.getElementById("countdown").textContent="40";
+  document.getElementById("next-label").textContent="";
+  document.getElementById("phase-pill").textContent="READY";
+}
+
+document.getElementById("sound-toggle").addEventListener("change",function(){
+  document.getElementById("sound-label").textContent=this.checked?"sound on":"sound off";
+});
+
+// ── Exercise list ─────────────────────────────────────────────────────────────
+(function buildList(){
+  document.getElementById("full-list").innerHTML=exercises.map((e,i)=>`
+    <div class="list-item">
+      <span class="list-num">${i+1}</span>
+      <span style="flex:1;">${e.name}</span>
+      <span style="display:flex;gap:4px;flex-wrap:wrap;">${tags2html(e.tags)}</span>
+    </div>`).join("");
+})();
+
+resetAll();
+</script>
+</body>
+</html>
