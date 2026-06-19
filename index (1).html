@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workouts — index</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #15120f;
+    --surface: #1d1814;
+    --surface2: #261f19;
+    --border: rgba(255,247,235,0.08);
+    --border2: rgba(255,247,235,0.16);
+    --text: #f5efe4;
+    --muted: #8c8175;
+
+    --derby: #c8f55a;
+    --derby-dim: rgba(200,245,90,0.10);
+    --lane: #e8a23a;
+    --lane-dim: rgba(232,162,58,0.10);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 3rem 1.25rem 5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .page { width: 100%; max-width: 720px; }
+
+  header { margin-bottom: 2.5rem; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 2.1rem;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  header p { color: var(--muted); font-size: 13px; line-height: 1.6; max-width: 480px; }
+
+  /* ── environment divider — the organizing axis ── */
+  .env-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 2.5rem 0 1rem;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  }
+  .env-divider .line { flex: 1; height: 1px; background: var(--border2); }
+  .env-divider:first-of-type { margin-top: 0; }
+
+  /* ── card ── */
+  .card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+    transition: border-color 0.15s, background 0.15s;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+    background: var(--accent, var(--derby));
+  }
+  .card:hover { background: var(--surface2); border-color: var(--border2); }
+
+  .card-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 0.6rem;
+  }
+  .card-name {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+  }
+  .env-tag {
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 20px;
+    border: 1px solid var(--accent, var(--derby));
+    color: var(--accent, var(--derby));
+    background: var(--accent-dim, var(--derby-dim));
+    white-space: nowrap;
+  }
+  .card-desc { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-bottom: 0.9rem; }
+
+  .meta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .meta {
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .meta b { color: var(--text); font-weight: 500; }
+
+  /* ── lane pair grouping ── */
+  .lane-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 540px) {
+    .lane-group { grid-template-columns: 1fr; }
+  }
+
+  .lane-shared-note {
+    font-size: 11px; color: var(--muted); line-height: 1.6;
+    margin-bottom: 0.9rem; padding: 0.6rem 0.8rem;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  }
+  .lane-shared-note b { color: var(--text); }
+
+  footer { margin-top: 3rem; font-size: 11px; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="eyebrow">workout artifacts</div>
+    <h1>Two floors, one lane.</h1>
+    <p>A small set of timers built for derby training — two for the open floor, two for the 19×5ft skating lane at home. Pick a card to open the timer.</p>
+  </header>
+
+  <div class="env-divider"><span>On skates · 19×5ft lane</span><div class="line"></div></div>
+
+  <div class="lane-shared-note">Both lane workouts assume a straight, clear 19ft × 5ft run on quads, hardwood floor, with a wall or counter nearby for balance support.</div>
+
+  <div class="lane-group">
+    <a class="card" href="./skating-lane-drills.html" style="--accent:#e8a23a;--accent-dim:rgba(232,162,58,0.10);">
+      <div class="card-top">
+        <span class="card-name">Skating Lane<br>Drills</span>
+      </div>
+      <div class="card-desc">Strides, T-stops, crossovers, plow stops, balance glides — the original lane circuit.</div>
+      <div class="meta-row">
+        <span class="meta"><b>60s</b>/20s</span>
+        <span class="meta"><b>10</b> moves</span>
+        <span class="meta"><b>3</b> circuits</span>
+      </div>
+    </a>
+
+    <a class="card" href="./skating-lane-2-with-hops.html" style="--accent:#e8a23a;--accent-dim:rgba(232,162,58,0.10);">
+      <div class="card-top">
+        <span class="card-name">Skating Lane 2<br>With Hops</span>
+      </div>
+      <div class="card-desc">Built around back-leg crossovers, pivot transitions, scissoring, low stance, and stationary hops.</div>
+      <div class="meta-row">
+        <span class="meta"><b>60s</b>/20s</span>
+        <span class="meta"><b>10</b> moves</span>
+        <span class="meta"><b>3</b> circuits</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="env-divider"><span>Off skates · floor</span><div class="line"></div></div>
+
+  <a class="card" href="./derby-fit-hiit-timer.html" style="--accent:#c8f55a;--accent-dim:rgba(200,245,90,0.10);">
+    <div class="card-top">
+      <span class="card-name">Derby.Fit</span>
+      <span class="env-tag" style="--accent:#c8f55a;--accent-dim:rgba(200,245,90,0.10);">no skates</span>
+    </div>
+    <div class="card-desc">Floor-based HIIT mixing cardio, stretch, core, coordination, hip work, and 2lb weighted moves — no skates required. Good for off-lane days.</div>
+    <div class="meta-row">
+      <span class="meta"><b>40s</b>/20s</span>
+      <span class="meta"><b>10</b> moves</span>
+      <span class="meta"><b>3</b> circuits</span>
+    </div>
+  </a>
+
+  <a class="card" href="./plow-jump-hiit.html" style="--accent:#f55a6e;--accent-dim:rgba(245,90,110,0.10);margin-top:10px;">
+    <div class="card-top">
+      <span class="card-name">Plow + Jump</span>
+      <span class="env-tag" style="--accent:#f55a6e;--accent-dim:rgba(245,90,110,0.10);">no skates</span>
+    </div>
+    <div class="card-desc">Strength and power circuit built for the left-foot plow stop and skating jumps — single-leg balance, low-rep squat jumps, hip stability, hop landings.</div>
+    <div class="meta-row">
+      <span class="meta"><b>40s</b>/20s</span>
+      <span class="meta"><b>10</b> moves</span>
+      <span class="meta"><b>3</b> circuits</span>
+    </div>
+  </a>
+
+  <footer>Open any card on a phone or laptop in the same folder as these files.</footer>
+
+</div>
+</body>
+</html>
