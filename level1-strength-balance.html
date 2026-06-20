@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Level 1 Strength & Balance</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e0f;
+    --surface: #1a1a1c;
+    --surface2: #242426;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8;
+    --muted: #7a7875;
+    --work: #5ab4f5;
+    --work-dim: rgba(90,180,245,0.12);
+    --rest: #f5a623;
+    --rest-dim: rgba(245,166,35,0.12);
+    --left: #f56a9a;
+    --left-dim: rgba(245,106,154,0.12);
+    --done: #a78bfa;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container { width: 100%; max-width: 480px; }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .title span { color: var(--work); }
+
+  .sound-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .sound-toggle input { display: none; }
+  .toggle-pill {
+    width: 32px; height: 18px;
+    background: var(--surface2);
+    border-radius: 9px;
+    position: relative;
+    border: 1px solid var(--border2);
+    transition: background 0.2s;
+  }
+  .toggle-pill::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: left 0.2s, background 0.2s;
+  }
+  .sound-toggle input:checked + .toggle-pill { background: var(--work-dim); border-color: var(--work); }
+  .sound-toggle input:checked + .toggle-pill::after { left: 17px; background: var(--work); }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+  }
+
+  .stat-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .stat-val   { font-size: 20px; font-weight: 500; color: var(--text); }
+
+  .progress-dots {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); transition: all 0.3s; flex-shrink: 0; }
+  .dot.active { background: var(--work); border-color: var(--work); box-shadow: 0 0 8px rgba(90,180,245,0.5); }
+  .dot.done   { background: var(--muted); border-color: var(--muted); }
+  .dot.left-side { background: var(--surface2); border-color: var(--left); }
+  .dot.left-side.done { background: var(--left); border-color: var(--left); opacity: 0.5; }
+  .dot.left-side.active { background: var(--left); border-color: var(--left); box-shadow: 0 0 8px rgba(245,106,154,0.5); }
+
+  .main-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .main-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--phase-color, var(--work));
+    transition: background 0.4s;
+  }
+
+  .phase-pill {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s;
+  }
+
+  .side-pill {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+    margin-left: 6px;
+    background: var(--left-dim);
+    color: var(--left);
+    border: 1px solid rgba(245,106,154,0.3);
+  }
+
+  .ex-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+  .tag {
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    background: var(--surface2);
+  }
+
+  .progress-wrap {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-bottom: 0.4rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--phase-color, var(--work));
+    transition: width 0.5s linear, background 0.4s;
+  }
+
+  .countdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+  }
+
+  .countdown {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  .next-label { font-size: 11px; color: var(--muted); text-align: right; max-width: 180px; line-height: 1.4; }
+
+  .tip {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    border-left: 2px solid var(--border2);
+    padding-left: 10px;
+    border-radius: 0;
+  }
+
+  .skill-note {
+    font-size: 11px;
+    color: var(--work);
+    line-height: 1.5;
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--border2);
+  }
+  .skill-note b { color: var(--text); }
+
+  .controls { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 1.5rem; }
+
+  button {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  button:hover { background: var(--surface2); border-color: rgba(255,255,255,0.2); }
+  button:active { transform: scale(0.97); }
+
+  #btn-start {
+    background: var(--work-dim);
+    border-color: var(--work);
+    color: var(--work);
+  }
+  #btn-start:hover { background: rgba(90,180,245,0.2); }
+
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 1.5rem;
+  }
+
+  .legend-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 11px;
+  }
+
+  .legend-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
+
+  details { margin-top: 0.5rem; }
+  summary {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    padding: 0.5rem 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: '▸'; font-size: 10px; transition: transform 0.2s; }
+  details[open] summary::before { transform: rotate(90deg); }
+
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-num { color: var(--muted); min-width: 20px; font-size: 11px; }
+  .list-dur { color: var(--muted); font-size: 11px; min-width: 32px; text-align: right; }
+
+  .done-screen {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+  .done-screen .trophy {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 4rem;
+    color: var(--work);
+    margin-bottom: 1rem;
+  }
+  .done-screen h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+  .done-screen p { color: var(--muted); font-size: 13px; margin-bottom: 1.5rem; }
+  .done-screen button { margin: 0 auto; max-width: 260px; }
+
+  @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .flash { animation: flash 0.3s ease; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="title">Level 1<span>.</span>strength</div>
+    <label class="sound-toggle">
+      <input type="checkbox" id="sound-toggle" checked>
+      <span class="toggle-pill"></span>
+      <span id="sound-label">sound on</span>
+    </label>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Exercise</div><div class="stat-val" id="stat-ex">1/21</div></div>
+    <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-val" id="stat-time">0:00</div></div>
+  </div>
+
+  <div class="progress-dots" id="progress-dots"></div>
+
+  <div class="main-card" id="main-card">
+    <div class="phase-pill" id="phase-pill" style="background:rgba(90,180,245,0.12);color:#5ab4f5;border:1px solid rgba(90,180,245,0.3);">READY</div>
+    <div class="ex-name" id="ex-name">Tree pose / single-leg balance</div>
+    <div class="tags" id="tags"></div>
+    <div class="countdown-row">
+      <div class="countdown" id="countdown" style="color:#5ab4f5;">45</div>
+      <div class="next-label" id="next-label"></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:100%;"></div></div>
+    <div style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:0.75rem;" id="phase-sub"></div>
+    <div class="tip" id="tip"></div>
+    <div class="skill-note" id="skill-note"></div>
+  </div>
+
+  <div class="controls">
+    <button id="btn-start" onclick="startPause()">▶ &nbsp;Start</button>
+    <button onclick="resetAll()">↺ &nbsp;Reset</button>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#5ab4f5;"></span>Work</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f5a623;"></span>Rest 15s</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f56a9a;"></span>Left side</div>
+  </div>
+
+  <details>
+    <summary>all exercises</summary>
+    <div id="full-list"></div>
+  </details>
+</div>
+
+<script>
+// Each exercise carries its own work duration. Rest is fixed at 15s between exercises.
+const REST = 15;
+
+const exercises = [
+  { name:"Tree pose / single-leg balance", side:"R", dur:45, tags:["balance"], tip:"Stand tall on your right leg, foot planted flat. Soft knee, eyes forward. If you wobble, find a fixed point to stare at.", skill:"Balance & Agility 3.1 — 30s single-leg balance test." },
+  { name:"Tree pose / single-leg balance", side:"L", dur:60, tags:["balance"], tip:"Same as right, extra time on your weaker side. Use the wall lightly if you need it — the goal is control, not toughing it out.", skill:"Balance & Agility 3.1 — left leg gets extra work since it's your weaker side." },
+  { name:"Single-leg deadlift", side:"R", dur:40, tags:["balance","weights"], tip:"2 lb weight optional. Hinge at the hip, standing leg soft, back leg reaches behind you for counterbalance. Keep hips square.", skill:"Glides (1.6) & Stops (1.5) — this is the strength and balance pattern behind a clean one-foot glide." },
+  { name:"Single-leg deadlift", side:"L", dur:50, tags:["balance","weights"], tip:"Same hinge, left leg standing. Go slow — this is the exact stability pattern your one-foot glide needs.", skill:"Glides (1.6) — extra time on left, your weaker balance leg." },
+  { name:"Clamshells", side:"R", dur:30, tags:["hip"], tip:"Lie on your right side, knees bent, feet together. Rotate top (left) knee open like a book. Don't let your hips roll back.", skill:"Crossovers (1.3) — builds the hip abductor strength behind the push leg." },
+  { name:"Clamshells", side:"L", dur:40, tags:["hip"], tip:"Lie on your left side now — this works your right hip abductor, but lying on the left also trains left-side core stability.", skill:"Crossovers (1.3) — extra time to balance overall hip work given your left-leg focus." },
+  { name:"Curtsy squats", dur:35, tags:["hip","coord"], tip:"Step one leg back and across behind you, bend both knees. Keep front knee tracking over your foot. Alternate sides.", skill:"Crossovers (1.3) — mimics the cross-behind step pattern directly." },
+  { name:"Side lunges", dur:35, tags:["hip","coord"], tip:"Big step to the side, sink into the bent knee, other leg stays straight. Push back to center through your heel. Alternate sides.", skill:"Crossovers & Weaving (1.3 / 3.4) — lateral hip strength for push-off and quick direction changes." },
+  { name:"Fire hydrants", side:"R", dur:25, tags:["hip"], tip:"On all fours, lift your right knee out to the side, hip height. Keep your core braced so you don't rock.", skill:"Stride & Crossovers (1.2 / 1.3) — hip abductor isolation." },
+  { name:"Fire hydrants", side:"L", dur:35, tags:["hip"], tip:"Same on your left — extra time here for your weaker side.", skill:"Stride & Crossovers (1.2 / 1.3) — extra left-side volume." },
+  { name:"Low squat hold (derby stance)", dur:45, tags:["core","balance"], tip:"Knees and hips bent, shoulders back, weight centered low and forward — your actual skating posture. Hold it.", skill:"Skating Posture (1.1) — direct endurance carryover to holding a low stance the whole track." },
+  { name:"Wall sit", dur:45, tags:["core"], tip:"Back flat against a wall, knees at 90°. Breathe steady. This is pure quad/glute endurance for staying low late in practice.", skill:"Skating Posture (1.1) — endurance for staying low, especially during the obstacle course and bus driver drills." },
+  { name:"Fast grapevine both directions", dur:30, tags:["cardio","coord"], tip:"Cross one foot over, step out, cross behind, step out. 15s each direction. Stay light on your feet.", skill:"Balance & Agility 3.1 — grapevine is tested directly in the small group test." },
+  { name:"Side shuffles", dur:30, tags:["cardio","coord"], tip:"Stay low, push off the outside foot, don't let your feet click together. Keep chest up.", skill:"Balance & Agility 3.1 / Bus Driver drill — shuffle side-to-side is tested directly." },
+  { name:"Quick step / happy feet", dur:25, tags:["coord"], tip:"Tiny fast steps in place, like you're warming up a jump rope. Stay light, stay low.", skill:"Balance & Agility 3.1 / Bus Driver — \"happy feet\" is called out by name in both." },
+  { name:"Knee taps forward and back", dur:30, tags:["coord","core"], tip:"Quick tap one knee toward the floor (don't fully kneel), pop back up, alternate. This patterns the quick-recovery motion of a knee fall without the impact.", skill:"Recovery Tactics — knee taps and knee falls require returning to stride within 3 seconds without hands." },
+  { name:"Plank", dur:40, tags:["core"], tip:"Neutral spine, squeeze glutes. Don't let hips sag or pike. This is what keeps your shoulders back in derby stance.", skill:"Skating Posture (1.1) — core control needed to keep shoulders back under fatigue." },
+  { name:"Plank with runners", dur:30, tags:["core","coord"], tip:"From plank, drive one knee toward your chest, then the other. Keep hips level — resist the rotation.", skill:"Skating Posture (1.1) & Focus (3.3) — core stability while your limbs move independently." },
+  { name:"Bicep curl + overhead press", dur:30, tags:["weights"], tip:"2 lb weights. Full curl, then press overhead. Control the descent.", skill:"General upper-body endurance — keeps shoulders from fatiguing during falls and stops." },
+  { name:"Deadlifts (bilateral)", dur:30, tags:["weights","hip"], tip:"2 lb weights. Hip hinge — push hips back, keep back flat. Squeeze glutes at the top.", skill:"Stride & Crossovers (1.2 / 1.3) — posterior chain strength for stride power." },
+  { name:"Side stretch + forward fold", dur:30, tags:["stretch"], tip:"Reach overhead and lean gently side to side, then fold forward and let your back round. Breathe.", skill:"Cooldown — loosens hips and hamstrings after the low-stance and hinge work above." },
+];
+
+const tagColors = {
+  cardio:  { bg:"rgba(245,166,35,0.12)",  color:"#f5a623", border:"rgba(245,166,35,0.3)"  },
+  core:    { bg:"rgba(90,180,245,0.12)",  color:"#5ab4f5", border:"rgba(90,180,245,0.3)"  },
+  coord:   { bg:"rgba(167,139,250,0.12)", color:"#a78bfa", border:"rgba(167,139,250,0.3)" },
+  hip:     { bg:"rgba(90,245,180,0.12)",  color:"#5af5b4", border:"rgba(90,245,180,0.3)"  },
+  stretch: { bg:"rgba(200,245,90,0.12)",  color:"#c8f55a", border:"rgba(200,245,90,0.3)"  },
+  weights: { bg:"rgba(245,90,90,0.12)",   color:"#f55a5a", border:"rgba(245,90,90,0.3)"   },
+  balance: { bg:"rgba(245,106,154,0.12)", color:"#f56a9a", border:"rgba(245,106,154,0.3)" },
+};
+const tagLabel = { cardio:"Cardio", core:"Core", coord:"Coordination", hip:"Hip/glutes", stretch:"Stretch", weights:"2 lb weights", balance:"Balance" };
+
+const phaseColors = { work:"#5ab4f5", rest:"#f5a623", idle:"#5ab4f5" };
+
+let exIdx=0, phase="idle", remaining=exercises[0].dur, totalElapsed=0;
+let timerInt=null, started=false;
+let audioCtx=null;
+
+function getAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+
+function beep(freq,dur,vol,delay){
+  try {
+    const ctx=getAudio(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type="sine"; o.frequency.value=freq;
+    const t=ctx.currentTime+delay;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.01);
+    g.gain.linearRampToValueAtTime(0,t+dur);
+    o.start(t); o.stop(t+dur+0.05);
+  } catch(e){}
+}
+
+function playSound(type){
+  if(!document.getElementById("sound-toggle").checked) return;
+  if(type==="work")  { beep(880,0.12,0.35,0); beep(1100,0.18,0.35,0.15); }
+  if(type==="rest")  { beep(660,0.18,0.25,0); }
+  if(type==="warn")  { beep(880,0.08,0.2,0); beep(880,0.08,0.2,0.15); beep(880,0.08,0.2,0.3); }
+  if(type==="done")  { [0,0.18,0.36,0.56].forEach((d,i)=>beep([880,1100,1320,1760][i],0.2,0.3,d)); }
+}
+
+function fmt(s){ return Math.floor(s/60)+":"+(s%60<10?"0":"")+s%60; }
+
+function tags2html(tags){
+  return tags.map(t=>{
+    const c=tagColors[t]||{bg:"",color:"#888",border:"#888"};
+    return `<span class="tag" style="background:${c.bg};color:${c.color};border-color:${c.border};">${tagLabel[t]||t}</span>`;
+  }).join("");
+}
+
+function setPhaseColor(color){
+  document.documentElement.style.setProperty("--phase-color", color);
+}
+
+function updateUI(){
+  const ex=exercises[exIdx];
+  const color = phase==="rest" ? phaseColors.rest : phaseColors.work;
+
+  setPhaseColor(color);
+
+  document.getElementById("ex-name").textContent = ex.name;
+  document.getElementById("tags").innerHTML       = tags2html(ex.tags);
+  document.getElementById("tip").textContent      = phase==="rest" ? "Rest. Shake it out, reset your stance for the next move." : ex.tip;
+  document.getElementById("skill-note").innerHTML = phase==="rest" ? "" : `<b>Why:</b> ${ex.skill}`;
+
+  const total  = phase==="rest" ? REST : ex.dur;
+  const pct    = Math.round(remaining/total*100);
+
+  document.getElementById("countdown").textContent = remaining;
+  document.getElementById("countdown").style.color = color;
+  document.getElementById("progress-fill").style.width = pct+"%";
+
+  const phaseLabel = phase==="work"?"WORK":phase==="rest"?"REST":"READY";
+  const pill=document.getElementById("phase-pill");
+  pill.textContent=phaseLabel;
+  pill.style.background=`${color}1e`;
+  pill.style.color=color;
+  pill.style.borderColor=`${color}4d`;
+
+  const sidePill = document.getElementById("side-pill-slot");
+
+  document.getElementById("stat-ex").textContent=(exIdx+1)+"/"+exercises.length;
+  document.getElementById("stat-time").textContent=fmt(totalElapsed);
+  document.getElementById("phase-sub").textContent = ex.side ? (ex.side==="L"?"left side":"right side") + " · " + ex.dur + "s" : ex.dur+"s hold";
+
+  renderDots();
+
+  let next="";
+  if(phase==="work"){
+    next="next → 15s rest";
+  } else if(phase==="rest"){
+    const ni=exIdx+1;
+    if(ni<exercises.length) next="next → "+exercises[ni].name+(exercises[ni].side?" ("+exercises[ni].side+")":"");
+    else next="next → done!";
+  }
+  document.getElementById("next-label").textContent=next;
+}
+
+function renderDots(){
+  const dc=document.getElementById("progress-dots");
+  dc.innerHTML="";
+  exercises.forEach((ex,i)=>{
+    const d=document.createElement("div");
+    d.className="dot"+(ex.side==="L"?" left-side":"");
+    if(i<exIdx) d.classList.add("done");
+    else if(i===exIdx) d.classList.add("active");
+    dc.appendChild(d);
+  });
+}
+
+function advance(){
+  if(phase==="work"){
+    phase="rest"; remaining=REST; playSound("rest");
+  } else {
+    exIdx++;
+    if(exIdx>=exercises.length){ endWorkout(); return; }
+    phase="work"; remaining=exercises[exIdx].dur; playSound("work");
+  }
+  updateUI();
+}
+
+function tick(){
+  remaining--; totalElapsed++;
+  if(remaining===3) playSound("warn");
+  if(remaining<=0) advance(); else updateUI();
+}
+
+function endWorkout(){
+  clearInterval(timerInt); playSound("done");
+  document.querySelector(".container").innerHTML=`
+    <div class="done-screen">
+      <div class="trophy">✦</div>
+      <h2>Workout complete</h2>
+      <p>${exercises.length} exercises &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
+      <button onclick="location.reload()" style="max-width:200px;">↺ &nbsp;Start over</button>
+    </div>`;
+}
+
+function startPause(){
+  if(!started){
+    started=true; phase="work"; remaining=exercises[0].dur;
+    document.getElementById("btn-start").innerHTML="⏸ &nbsp;Pause";
+    document.getElementById("btn-start").style.background="rgba(90,180,245,0.08)";
+    playSound("work"); updateUI();
+    timerInt=setInterval(tick,1000);
+  } else if(timerInt){
+    clearInterval(timerInt); timerInt=null;
+    document.getElementById("btn-start").innerHTML="▶ &nbsp;Resume";
+  } else {
+    timerInt=setInterval(tick,1000);
+    document.getElementById("btn-start").innerHTML="⏸ &nbsp;Pause";
+  }
+}
+
+function resetAll(){
+  clearInterval(timerInt); timerInt=null; started=false;
+  exIdx=0; phase="idle"; remaining=exercises[0].dur; totalElapsed=0;
+  document.getElementById("btn-start").innerHTML="▶ &nbsp;Start";
+  document.getElementById("btn-start").style.background="var(--work-dim)";
+  setPhaseColor("#5ab4f5");
+  updateUI();
+  document.getElementById("countdown").textContent=exercises[0].dur;
+  document.getElementById("next-label").textContent="";
+  document.getElementById("phase-pill").textContent="READY";
+}
+
+document.getElementById("sound-toggle").addEventListener("change",function(){
+  document.getElementById("sound-label").textContent=this.checked?"sound on":"sound off";
+});
+
+(function buildList(){
+  document.getElementById("full-list").innerHTML=exercises.map((e,i)=>`
+    <div class="list-item">
+      <span class="list-num">${i+1}</span>
+      <span style="flex:1;">${e.name}${e.side?' <span style="color:'+(e.side==='L'?'#f56a9a':'#7a7875')+';font-size:10px;">('+e.side+')</span>':''}</span>
+      <span class="list-dur">${e.dur}s</span>
+      <span style="display:flex;gap:4px;">${tags2html(e.tags)}</span>
+    </div>`).join("");
+})();
+
+resetAll();
+</script>
+</body>
+</html>
