@@ -333,11 +333,11 @@
     <div class="ex-name" id="ex-name">High knees</div>
     <div class="tags" id="tags"></div>
     <div class="countdown-row">
-      <div class="countdown" id="countdown" style="color:#f5685a;">30</div>
+      <div class="countdown" id="countdown" style="color:#f5685a;">40</div>
       <div class="next-label" id="next-label"></div>
     </div>
     <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:100%;"></div></div>
-    <div style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:0.75rem;" id="phase-sub">30s work · 20s rest</div>
+    <div style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:0.75rem;" id="phase-sub">40s work · 20s rest</div>
     <div class="tip" id="tip">Drive knees up to hip height. Pump your arms, stay light on your feet.</div>
   </div>
 
@@ -347,7 +347,7 @@
   </div>
 
   <div class="legend">
-    <div class="legend-item"><span class="legend-dot" style="background:#f5685a;"></span>Work 30s</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f5685a;"></span>Work 40s</div>
     <div class="legend-item"><span class="legend-dot" style="background:#f5a623;"></span>Rest 20s</div>
     <div class="legend-item"><span class="legend-dot" style="background:#5ab4f5;"></span>Break 60s</div>
   </div>
@@ -363,7 +363,7 @@ const exercises = [
   { name:"High knees",                  tags:["cardio"],           tip:"Drive knees up to hip height. Pump your arms, stay light on your feet." },
   { name:"Plank",                       tags:["core"],             tip:"Neutral spine, squeeze glutes. Don't let hips sag or pike." },
   { name:"High skip",                   tags:["cardio"],           tip:"Skip with height, not just speed. Land soft, drive the opposite arm." },
-  { name:"Leg extension on all fours",  tags:["core","hip"],       tip:"On all fours, extend one leg straight back, hip height. Keep your back flat — don't let it arch." },
+  { name:"Leg lifts",                   tags:["core"],             tip:"Flat on your back. Keep lower back pressed down. Slow and controlled." },
   { name:"Bicep curl + overhead press", tags:["weights"],          tip:"2 lb weights. Full curl, then press overhead. Control the descent." },
   { name:"Fast grapevine",              tags:["cardio","coord"],   tip:"Lead both directions — 15s each side. Stay light on your feet." },
   { name:"Knee taps forward and back",  tags:["core","coord"],     tip:"Quick tap one knee toward the floor, pop back up, alternate forward and back." },
@@ -384,7 +384,7 @@ const tagLabel = { cardio:"Cardio", core:"Core", coord:"Coordination", hip:"Hip/
 
 const phaseColors = { work:"#f5685a", rest:"#f5a623", break:"#5ab4f5", idle:"#f5685a" };
 
-const WORK=30, REST=20, BREAK=60, CIRCUITS=3;
+const WORK=40, REST=20, BREAK=60, CIRCUITS=3;
 let circuit=0, exIdx=0, phase="idle", remaining=WORK, totalElapsed=0;
 let timerInt=null, started=false;
 let audioCtx=null;
@@ -525,7 +525,7 @@ function resetAll(){
   document.getElementById("btn-start").style.background="var(--work-dim)";
   setPhaseColor("#f5685a");
   updateUI();
-  document.getElementById("countdown").textContent="30";
+  document.getElementById("countdown").textContent="40";
   document.getElementById("next-label").textContent="";
   document.getElementById("phase-pill").textContent="READY";
 }
