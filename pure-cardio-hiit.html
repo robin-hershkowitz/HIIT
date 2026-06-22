@@ -384,7 +384,7 @@ const tagLabel = { cardio:"Cardio", core:"Core", coord:"Coordination", hip:"Hip/
 
 const phaseColors = { work:"#f54ed1", rest:"#f5a623", break:"#5ab4f5", idle:"#f54ed1" };
 
-const WORK=30, REST=20, BREAK=60, CIRCUITS=3;
+const WORK=30, REST=20, BREAK=60, CIRCUITS=4;
 let circuit=0, exIdx=0, phase="idle", remaining=WORK, totalElapsed=0;
 let timerInt=null, started=false;
 let audioCtx=null;
@@ -497,7 +497,7 @@ function endWorkout(){
     <div class="done-screen">
       <div class="trophy">✦</div>
       <h2>Workout complete</h2>
-      <p>3 circuits &nbsp;·&nbsp; 30 exercises &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
+      <p>${CIRCUITS} circuits &nbsp;·&nbsp; ${CIRCUITS*10} exercises &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
       <button onclick="location.reload()" style="max-width:200px;">↺ &nbsp;Start over</button>
     </div>`;
 }

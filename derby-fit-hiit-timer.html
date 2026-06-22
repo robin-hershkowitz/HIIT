@@ -430,7 +430,7 @@ const tagLabel = {
 const phaseColors = { work:"#c8f55a", rest:"#f5a623", break:"#5ab4f5", idle:"#c8f55a" };
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const WORK=40, REST=20, BREAK=60, CIRCUITS=3;
+const WORK=40, REST=20, BREAK=60, CIRCUITS=4;
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let circuit=0, exIdx=0, phase="idle", remaining=WORK, totalElapsed=0;
@@ -562,7 +562,7 @@ function endWorkout(){
     <div class="done-screen">
       <div class="trophy">✦</div>
       <h2>Workout complete</h2>
-      <p>3 circuits &nbsp;·&nbsp; 30 exercises &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
+      <p>${CIRCUITS} circuits &nbsp;·&nbsp; ${CIRCUITS*10} exercises &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
       <button onclick="location.reload()" style="max-width:200px;">↺ &nbsp;Start over</button>
     </div>`;
 }
