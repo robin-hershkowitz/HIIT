@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Plan — derby training</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #15120f;
+    --surface: #1d1814;
+    --surface2: #261f19;
+    --border: rgba(255,247,235,0.08);
+    --border2: rgba(255,247,235,0.16);
+    --text: #f5efe4;
+    --muted: #8c8175;
+
+    --skate: #e8a23a;   /* on-skates / lane */
+    --foot:  #7c8cf8;   /* footwork / agility */
+    --strength: #4a90d9; /* strength / weights */
+    --flex:  #c8f55a;   /* flex / rest */
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 3rem 1.25rem 5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .page { width: 100%; max-width: 720px; }
+
+  .back-link {
+    font-size: 11px; letter-spacing: 0.06em; color: var(--muted);
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    margin-bottom: 1.5rem;
+  }
+  .back-link:hover { color: var(--text); }
+
+  header { margin-bottom: 2rem; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 2.1rem;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  header p { color: var(--muted); font-size: 13px; line-height: 1.7; max-width: 520px; }
+
+  /* ── the principle strip ── */
+  .principles {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin: 1.75rem 0 2.5rem;
+  }
+  @media (max-width: 540px){ .principles { grid-template-columns: 1fr; } }
+  .principle {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 0.9rem 1rem;
+  }
+  .principle h3 {
+    font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text); margin-bottom: 6px; font-weight: 500;
+  }
+  .principle p { font-size: 11.5px; color: var(--muted); line-height: 1.6; }
+
+  /* ── day rows ── */
+  .day {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .day::before {
+    content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
+    background: var(--accent, var(--muted));
+  }
+  .day-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin-bottom: 0.5rem; flex-wrap: wrap;
+  }
+  .day-name {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1.15rem; letter-spacing: -0.01em;
+  }
+  .day-tag {
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px;
+    border: 1px solid var(--accent, var(--muted));
+    color: var(--accent, var(--muted));
+    white-space: nowrap;
+  }
+  .day-focus { font-size: 12.5px; color: var(--text); line-height: 1.6; margin-bottom: 0.5rem; }
+  .day-skills { font-size: 11.5px; color: var(--muted); line-height: 1.7; }
+  .day-skills b { color: var(--text); font-weight: 500; }
+  .day-time {
+    font-size: 10.5px; color: var(--muted); margin-top: 0.7rem;
+    letter-spacing: 0.04em;
+  }
+
+  .closing {
+    margin-top: 2.5rem; padding: 1.25rem 1.4rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--flex); border-radius: 12px;
+  }
+  .closing h3 { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; font-weight: 500; }
+  .closing p { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+  footer { margin-top: 2.5rem; font-size: 11px; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a class="back-link" href="./index.html">← back to timers</a>
+
+  <header>
+    <div class="eyebrow">weekly plan · level 1</div>
+    <h1>Four sessions, not three hours a day.</h1>
+    <p>You don't drill every skill every day — you rotate, and you let skills overlap. One on-skates day, one footwork day, one strength day, one flex day. Around two hours a week, and every assessment skill gets touched. Skating-only skills get priority on skate days because nothing off-skates fully replaces them.</p>
+  </header>
+
+  <div class="principles">
+    <div class="principle">
+      <h3>Skills overlap</h3>
+      <p>One timer hits four or five assessment skills at once. Crossovers, scissoring, and getting low share the same hips and edges. You're further along than the list looks.</p>
+    </div>
+    <div class="principle">
+      <h3>Rest is training</h3>
+      <p>Rotating means some skills rest while others work. That rest is when the left-leg neuromuscular work consolidates. Resting a skill isn't neglecting it.</p>
+    </div>
+    <div class="principle">
+      <h3>Protect skate time</h3>
+      <p>Crossovers, stops, glides, backward skating need skates. Those get priority when you're on wheels. Strength and footwork flex around them — even in socks.</p>
+    </div>
+    <div class="principle">
+      <h3>Spend time on the gap</h3>
+      <p>Front-load what you'll be tested on and are furthest from passing: left-leg work, back-leg crossover push, the stops. Don't polish what's already solid.</p>
+    </div>
+  </div>
+
+  <div class="day" style="--accent:var(--skate);">
+    <div class="day-head">
+      <span class="day-name">Day 1 — Skate</span>
+      <span class="day-tag">on skates · lane</span>
+    </div>
+    <div class="day-focus">The skills only skating builds. Priority day — nothing off-skates replaces these.</div>
+    <div class="day-skills"><b>Skills:</b> crossovers (back-leg push), T-stops & plow stops, pivot transitions, one-foot glides, backward skating, scissoring.</div>
+    <div class="day-skills" style="margin-top:6px;"><b>Use:</b> Skating Lane Drills · Skating Lane 2 (With Hops)</div>
+    <div class="day-time">~30 min · one lane timer</div>
+  </div>
+
+  <div class="day" style="--accent:var(--foot);">
+    <div class="day-head">
+      <span class="day-name">Day 2 — Footwork</span>
+      <span class="day-tag">off skates · floor</span>
+    </div>
+    <div class="day-focus">Agility and balance off the wheels — trains the footwork patterns that transfer straight to skates.</div>
+    <div class="day-skills"><b>Skills:</b> grapevines (both directions), side shuffles, quick step / happy feet, 30-sec single-leg balance (left bias), lateral lunges.</div>
+    <div class="day-skills" style="margin-top:6px;"><b>Use:</b> Grapevine & Agility HIIT · Level 1 Strength & Balance</div>
+    <div class="day-time">~30 min · one footwork timer</div>
+  </div>
+
+  <div class="day" style="--accent:var(--strength);">
+    <div class="day-head">
+      <span class="day-name">Day 3 — Strength</span>
+      <span class="day-tag">off skates · weights</span>
+    </div>
+    <div class="day-focus">Build the muscles that power the skating — hips and posterior chain for stops and crossovers, upper body for posture and balance.</div>
+    <div class="day-skills"><b>Skills:</b> hip & adductor strength (plow stops), explosive hip extension (jammer starts), back & shoulders, left-leg loading.</div>
+    <div class="day-skills" style="margin-top:6px;"><b>Use:</b> Plow + Jump HIIT · Upper Body Weights HIIT · Cardio & Core</div>
+    <div class="day-time">~30 min · one strength timer</div>
+  </div>
+
+  <div class="day" style="--accent:var(--flex);">
+    <div class="day-head">
+      <span class="day-name">Day 4 — Flex</span>
+      <span class="day-tag">your call</span>
+    </div>
+    <div class="day-focus">Whatever felt weakest this week — or genuine rest. Both are legitimate. Listen to the ankle.</div>
+    <div class="day-skills"><b>Options:</b> repeat the weakest skill from days 1–3, do a light cardio timer, stretch and mobility only, or take the day fully off.</div>
+    <div class="day-skills" style="margin-top:6px;"><b>Use:</b> Pure Cardio HIIT · Derby.Fit · or rest</div>
+    <div class="day-time">~0–30 min · optional</div>
+  </div>
+
+  <div class="closing">
+    <h3>The one thing to let go of</h3>
+    <p>You don't need to be even across everything every week. Some weeks the skate day matters most; some weeks it's the left-leg work. Pick the rotation, protect the skate sessions, and trust that overlap and rest are doing work even on the days a skill sits idle. Sharp pain or a sore ankle the next morning means scale back — you lose weeks pushing through the wrong pain, almost nothing by resting a day.</p>
+  </div>
+
+  <footer>A rhythm, not a rulebook. Move days around to fit your week.</footer>
+
+</div>
+</body>
+</html>
