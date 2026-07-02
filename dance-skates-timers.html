@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dance Skates — Move Timers</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e0f;
+    --surface: #1a1a1c;
+    --surface2: #242426;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8;
+    --muted: #7a7875;
+    --accent: #2dd4bf;
+    --accent-dim: rgba(45,212,191,0.12);
+    --rest: #f5685a;
+    --rest-dim: rgba(245,104,90,0.12);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container { width: 100%; max-width: 480px; }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  .title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+  }
+  .title span { color: var(--accent); }
+
+  .subtitle { font-size: 12px; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.5; }
+
+  .sound-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--muted); cursor: pointer; user-select: none;
+  }
+  .sound-toggle input { display: none; }
+  .toggle-pill {
+    width: 32px; height: 18px; background: var(--surface2); border-radius: 9px;
+    position: relative; border: 1px solid var(--border2); transition: background 0.2s;
+  }
+  .toggle-pill::after {
+    content: ''; position: absolute; left: 3px; top: 3px; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--muted); transition: left 0.2s, background 0.2s;
+  }
+  .sound-toggle input:checked + .toggle-pill { background: var(--accent-dim); border-color: var(--accent); }
+  .sound-toggle input:checked + .toggle-pill::after { left: 17px; background: var(--accent); }
+
+  .main-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .main-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--phase-color, var(--accent)); transition: background 0.4s;
+  }
+
+  .phase-pill {
+    display: inline-block; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 0.75rem;
+  }
+
+  .ex-name {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.4rem;
+    letter-spacing: -0.02em; line-height: 1.25; margin-bottom: 0.5rem;
+  }
+
+  .ex-placeholder { color: var(--muted); font-size: 13px; line-height: 1.6; padding: 0.5rem 0 0.25rem; }
+
+  .tag {
+    display: inline-block; font-size: 10px; padding: 3px 9px; border-radius: 20px;
+    letter-spacing: 0.04em; border: 1px solid var(--border2); color: var(--muted);
+    background: var(--surface2); margin-bottom: 0.9rem;
+  }
+
+  .countdown-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; }
+  .countdown { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3rem; line-height: 1; transition: color 0.3s; }
+
+  .progress-wrap { height: 4px; background: var(--surface2); border-radius: 2px; margin-bottom: 1rem; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 2px; background: var(--phase-color, var(--accent)); transition: width 1s linear, background 0.4s; }
+
+  .tip { font-size: 12px; color: var(--muted); line-height: 1.6; border-left: 2px solid var(--border2); padding-left: 10px; margin-bottom: 1rem; }
+
+  .main-controls { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; }
+
+  button {
+    font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500;
+    padding: 0.85rem 1rem; border-radius: 10px; border: 1px solid var(--border2);
+    background: var(--surface); color: var(--text); cursor: pointer; letter-spacing: 0.04em;
+    transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  button:hover { background: var(--surface2); border-color: rgba(255,255,255,0.2); }
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.4; cursor: default; }
+  button:disabled:hover { background: var(--surface); }
+
+  #btn-start { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  #btn-start:hover { background: rgba(45,212,191,0.2); }
+
+  .section-label {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    margin: 1.5rem 0 0.6rem;
+  }
+
+  .move-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .move-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 0.9rem 1rem; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .move-card:hover { background: var(--surface2); border-color: var(--border2); }
+  .move-card.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .move-card.rest-card.selected { border-color: var(--rest); background: var(--rest-dim); }
+
+  .move-left { display: flex; flex-direction: column; gap: 4px; }
+  .move-name { font-size: 13.5px; font-weight: 500; }
+  .move-meta { display: flex; gap: 6px; align-items: center; }
+  .move-tag {
+    font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 20px;
+  }
+  .move-dur { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  footer { margin-top: 2rem; font-size: 11px; color: var(--muted); text-align: center; line-height: 1.6; }
+
+  @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.35} }
+  .flash { animation: flash 0.35s ease 3; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="title">Dance<span>.</span>skates</div>
+    <label class="sound-toggle">
+      <input type="checkbox" id="sound-toggle" checked>
+      <span class="toggle-pill"></span>
+      <span id="sound-label">sound on</span>
+    </label>
+  </div>
+  <div class="subtitle">Pick a move, run its timer. Strut, manuals, and the downtown — plus a 30s rest whenever you want it.</div>
+
+  <div class="main-card" id="main-card">
+    <div id="main-body">
+      <div class="ex-placeholder">Choose a move below to load its timer.</div>
+    </div>
+  </div>
+
+  <div class="section-label">moves</div>
+  <div class="move-list" id="move-list"></div>
+
+  <footer>Ankle caution: manuals load the back-wheel/dorsiflexion position differently than anything else in rotation — ease in on the wall-supported versions first.</footer>
+</div>
+
+<script>
+const tagStyles = {
+  strut:    { color:"#2dd4bf", bg:"rgba(45,212,191,0.14)" },
+  manual:   { color:"#a78bfa", bg:"rgba(167,139,250,0.14)" },
+  downtown: { color:"#e8b23a", bg:"rgba(232,178,58,0.14)" },
+  mobility: { color:"#5ab4f5", bg:"rgba(90,180,245,0.14)" },
+  rest:     { color:"#f5685a", bg:"rgba(245,104,90,0.14)" },
+};
+const tagLabel = { strut:"Strut", manual:"Manual", downtown:"Downtown", mobility:"Mobility", rest:"Rest" };
+
+const moves = [
+  { id:0, name:"Ankle circles + calf raises", tag:"mobility", dur:300, tip:"Wall or counter support. Slow circles each direction, then rise onto toe stops and lower. Wakes up the ankle before manual work." },
+  { id:1, name:"Toe-stop rock & bounce",       tag:"strut",    dur:300, tip:"In place. Press onto your toe stops and bounce the weight, finding a steady rhythm. This is the strut's foundation." },
+  { id:2, name:"Heel-toe weight-shift walk",   tag:"strut",    dur:300, tip:"Down the lane. Rock from heel to toe on each skate as you travel, exaggerating the weight shift." },
+  { id:3, name:"Double-foot manual hold (wall)", tag:"manual", dur:300, tip:"Hold the wall/counter. Lean back onto your rear wheels, both feet, and hold. Sharp pain in the ankle = stop." },
+  { id:4, name:"Single-skate manual (wall), left bias", tag:"manual", dur:300, tip:"Wall-supported, one skate at a time. Extra time and holds on the left to rebuild that side's confidence." },
+  { id:5, name:"Hip circles / figure-8 sway",  tag:"mobility", dur:300, tip:"Standing in place. Loosen the hips with slow circles then a figure-8 — this is the swing that drives the strut." },
+  { id:6, name:"Cross-step glide",             tag:"downtown", dur:300, tip:"Down the lane. Cross one foot over the other and glide before switching — the core footwork of the downtown." },
+  { id:7, name:"Syncopated side shuffle + cross", tag:"downtown", dur:300, tip:"Down and back. Shuffle side to side, adding a cross-step on the offbeat. Feel for the rhythm, not just the steps." },
+  { id:8, name:"Free-standing manual, left bias", tag:"manual", dur:300, tip:"Away from the wall now. Short holds, more attempts than reps. Left leg gets the extra turns." },
+  { id:9, name:"Full strut down the lane",     tag:"strut",    dur:300, tip:"Put it together — rock, bounce, and travel down the lane in one flowing strut." },
+  { id:10, name:"Rest", tag:"rest", dur:30, tip:"Shake it out. Hydrate. Ready when you are." },
+];
+
+let current = null;
+let remaining = 0;
+let total = 0;
+let timerInt = null;
+let running = false;
+let audioCtx = null;
+
+function getAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+function beep(freq,dur,vol,delay){
+  try {
+    const ctx=getAudio(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type="sine"; o.frequency.value=freq;
+    const t=ctx.currentTime+delay;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.01);
+    g.gain.linearRampToValueAtTime(0,t+dur);
+    o.start(t); o.stop(t+dur+0.05);
+  } catch(e){}
+}
+function playSound(type){
+  if(!document.getElementById("sound-toggle").checked) return;
+  if(type==="start") { beep(880,0.12,0.35,0); beep(1100,0.18,0.35,0.15); }
+  if(type==="warn")  { beep(880,0.08,0.2,0); beep(880,0.08,0.2,0.15); beep(880,0.08,0.2,0.3); }
+  if(type==="done")  { [0,0.18,0.36,0.56].forEach((d,i)=>beep([880,1100,1320,1760][i],0.2,0.3,d)); }
+}
+
+function fmt(s){ return Math.floor(s/60)+":"+(s%60<10?"0":"")+s%60; }
+
+function renderList(){
+  const list = document.getElementById("move-list");
+  list.innerHTML = moves.map(m=>{
+    const style = tagStyles[m.tag];
+    const isRest = m.tag==="rest";
+    const selected = current && current.id===m.id;
+    return `<div class="move-card ${isRest?'rest-card':''} ${selected?'selected':''}" onclick="selectMove(${m.id})">
+      <div class="move-left">
+        <div class="move-name">${m.name}</div>
+        <div class="move-meta"><span class="move-tag" style="background:${style.bg};color:${style.color};">${tagLabel[m.tag]}</span></div>
+      </div>
+      <div class="move-dur">${fmt(m.dur)}</div>
+    </div>`;
+  }).join("");
+}
+
+function selectMove(id){
+  const m = moves.find(x=>x.id===id);
+  if(!m) return;
+  clearInterval(timerInt); timerInt=null; running=false;
+  current = m; remaining = m.dur; total = m.dur;
+  renderMain();
+  renderList();
+}
+
+function renderMain(){
+  const body = document.getElementById("main-body");
+  const card = document.getElementById("main-card");
+  if(!current){
+    card.style.setProperty("--phase-color", "#2dd4bf");
+    body.innerHTML = `<div class="ex-placeholder">Choose a move below to load its timer.</div>`;
+    return;
+  }
+  const style = tagStyles[current.tag];
+  card.style.setProperty("--phase-color", style.color);
+  const pct = Math.round(remaining/total*100);
+  const label = running ? "RUNNING" : (remaining===total ? "READY" : (remaining<=0 ? "DONE" : "PAUSED"));
+
+  body.innerHTML = `
+    <div class="phase-pill" style="background:${style.bg};color:${style.color};border:1px solid ${style.color}55;">${label}</div>
+    <div class="ex-name">${current.name}</div>
+    <span class="tag" style="background:${style.bg};color:${style.color};border-color:${style.color}55;">${tagLabel[current.tag]}</span>
+    <div class="countdown-row">
+      <div class="countdown" id="countdown" style="color:${style.color};">${remaining}</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:${pct}%;"></div></div>
+    <div class="tip">${current.tip}</div>
+    <div class="main-controls">
+      <button id="btn-start" onclick="toggleTimer()">${running ? '⏸ &nbsp;Pause' : (remaining<=0 ? '↺ &nbsp;Restart' : (remaining===total ? '▶ &nbsp;Start' : '▶ &nbsp;Resume'))}</button>
+      <button onclick="resetCurrent()">↺ &nbsp;Reset</button>
+    </div>
+  `;
+}
+
+function toggleTimer(){
+  if(!current) return;
+  if(remaining<=0){ remaining = total; }
+  if(!running){
+    running = true;
+    playSound("start");
+    renderMain();
+    timerInt = setInterval(tick, 1000);
+  } else {
+    running = false;
+    clearInterval(timerInt); timerInt = null;
+    renderMain();
+  }
+}
+
+function tick(){
+  remaining--;
+  if(remaining===3) playSound("warn");
+  if(remaining<=0){
+    remaining = 0;
+    clearInterval(timerInt); timerInt=null; running=false;
+    playSound("done");
+    renderMain();
+    document.getElementById("main-card").classList.add("flash");
+    setTimeout(()=>document.getElementById("main-card").classList.remove("flash"), 1100);
+  } else {
+    renderMain();
+  }
+}
+
+function resetCurrent(){
+  if(!current) return;
+  clearInterval(timerInt); timerInt=null; running=false;
+  remaining = total;
+  renderMain();
+}
+
+document.getElementById("sound-toggle").addEventListener("change",function(){
+  document.getElementById("sound-label").textContent=this.checked?"sound on":"sound off";
+});
+
+renderList();
+renderMain();
+</script>
+</body>
+</html>
