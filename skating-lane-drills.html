@@ -290,10 +290,10 @@ const exercises = [
   { name:"Mini crossover steps", tags:["coord","hip","travel"], travel:true,
     tip:"Slow, controlled crossover mechanics — weight shift, cross, recover — moving gradually down the lane.",
     safety:"Keep crossovers small and slow at first; width is tight, so don't reach wide." },
-  { name:"Bicep curl + overhead press", tags:["weights"], travel:false,
-    tip:"2 lb weights. Stand in a stable derby-ready stance mid-lane. Curl, then press overhead. Control the descent.",
-    safety:"Feet shoulder-width, knees soft. Pause if you feel unsteady — set weights down, don't catch yourself with them in hand." },
-  { name:"Plow stop holds", tags:["stop","skill"], travel:true,
+  { name:"Forward-to-backward transitions", tags:["skill","coord","travel"], travel:true,
+    tip:"Build a little speed, pivot smoothly from forward to backward without losing your glide, then pivot back. Focus on carrying momentum through the turn rather than stopping to do it.",
+    safety:"Walk through the pivot at a near-stop speed first. Stay near the wall until the turn feels smooth." },
+  { name:"Plow stop holds", tags:["stop","skill","travel"], travel:true,
     tip:"Glide a few feet, drop into a plow stop, hold the braking position 2-3 seconds, roll out, reset.",
     safety:"Keep knees bent and weight centered — don't lean back. Practice at a near-stop speed first." },
   { name:"One-leg balance glides", tags:["balance","core","travel"], travel:true,
@@ -305,9 +305,9 @@ const exercises = [
   { name:"Backward stride practice", tags:["cardio","coord","travel"], travel:true,
     tip:"Small controlled backward pushes down the lane. Look over your shoulder periodically to track distance to the wall.",
     safety:"Go slow — backward stops take longer to execute. Stay near the wall for support and stop well short of it." },
-  { name:"Deadlifts with weights", tags:["weights","hip"], travel:false,
-    tip:"2 lb weights, standing still. Hip hinge — push hips back, flat back, squeeze glutes at the top.",
-    safety:"Stable stance, weight centered over both skates before bending." },
+  { name:"Scissoring, left leg forward", tags:["coord","hip","travel"], travel:true,
+    tip:"Glide with one foot forward and one back in a scissor stance, then switch. Extra reps with the left leg forward — that's the weaker pattern to build up.",
+    safety:"Keep knees soft and weight centered between both skates. Don't let the front knee lock out." },
   { name:"Tree pose + side stretch", tags:["stretch","balance"], travel:false,
     tip:"Stationary at the end of the lane. Balance on your stronger leg, use the wall if needed, reach overhead and lean gently to stretch the side body.",
     safety:"Hold the wall for this one if balance feels at all uncertain on wheels." },
@@ -318,7 +318,6 @@ const tagColors = {
   coord:   { bg:"rgba(167,139,250,0.14)", color:"#a78bfa", border:"rgba(167,139,250,0.35)" },
   hip:     { bg:"rgba(95,184,138,0.14)",  color:"#5fb88a", border:"rgba(95,184,138,0.35)"  },
   stretch: { bg:"rgba(245,239,228,0.10)", color:"#f5efe4", border:"rgba(245,239,228,0.3)"  },
-  weights: { bg:"rgba(212,90,90,0.14)",   color:"#d45a5a", border:"rgba(212,90,90,0.35)"   },
   stop:    { bg:"rgba(90,159,212,0.14)",  color:"#5a9fd4", border:"rgba(90,159,212,0.35)"  },
   skill:   { bg:"rgba(90,159,212,0.14)",  color:"#5a9fd4", border:"rgba(90,159,212,0.35)"  },
   balance: { bg:"rgba(245,239,228,0.10)", color:"#f5efe4", border:"rgba(245,239,228,0.3)"  },
@@ -327,7 +326,7 @@ const tagColors = {
 };
 const tagLabel = {
   cardio:"Cardio", coord:"Coordination", hip:"Hip rotation", stretch:"Stretch",
-  weights:"2 lb weights", stop:"Stop practice", skill:"Skill", balance:"Balance",
+  stop:"Stop practice", skill:"Skill", balance:"Balance",
   core:"Core", travel:"Travels lane"
 };
 
