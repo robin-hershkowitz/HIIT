@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-Practice Warmup</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #15120f;
+    --surface: #1d1814;
+    --surface2: #261f19;
+    --border: rgba(255,247,235,0.08);
+    --border2: rgba(255,247,235,0.16);
+    --text: #f5efe4;
+    --muted: #8c8175;
+    --work: #8fae6a;
+    --work-dim: rgba(143,174,106,0.12);
+    --done: #a78bfa;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container { width: 100%; max-width: 480px; }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .title {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .title span { color: var(--work); }
+
+  .sound-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .sound-toggle input { display: none; }
+  .toggle-pill {
+    width: 32px; height: 18px;
+    background: var(--surface2);
+    border-radius: 9px;
+    position: relative;
+    border: 1px solid var(--border2);
+    transition: background 0.2s;
+  }
+  .toggle-pill::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: left 0.2s, background 0.2s;
+  }
+  .sound-toggle input:checked + .toggle-pill { background: var(--work-dim); border-color: var(--work); }
+  .sound-toggle input:checked + .toggle-pill::after { left: 17px; background: var(--work); }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+  }
+
+  .stat-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .stat-val   { font-size: 20px; font-weight: 500; color: var(--text); }
+
+  .move-dots {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+    align-items: center;
+  }
+  .move-dots .label { font-size: 11px; color: var(--muted); margin-right: 4px; letter-spacing: 0.06em; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); transition: all 0.3s; }
+  .dot.active { background: var(--work); border-color: var(--work); box-shadow: 0 0 8px rgba(143,174,106,0.5); }
+  .dot.done   { background: var(--muted); border-color: var(--muted); }
+
+  .main-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .main-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--work);
+  }
+
+  .phase-pill {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+    background: var(--work-dim);
+    color: var(--work);
+    border: 1px solid rgba(143,174,106,0.3);
+  }
+
+  .ex-name {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+  .tag {
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    background: var(--surface2);
+  }
+
+  .progress-wrap {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-bottom: 0.4rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--work);
+    transition: width 0.5s linear;
+  }
+
+  .countdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+  }
+
+  .countdown {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--work);
+  }
+
+  .next-label { font-size: 11px; color: var(--muted); text-align: right; max-width: 180px; line-height: 1.4; }
+
+  .tip {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    border-left: 2px solid var(--border2);
+    padding-left: 10px;
+    border-radius: 0;
+  }
+
+  .controls { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 1.5rem; }
+
+  button {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  button:hover { background: var(--surface2); border-color: rgba(255,255,255,0.2); }
+  button:active { transform: scale(0.97); }
+
+  #btn-start {
+    background: var(--work-dim);
+    border-color: var(--work);
+    color: var(--work);
+  }
+  #btn-start:hover { background: rgba(143,174,106,0.2); }
+
+  details { margin-top: 0.5rem; }
+  summary {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    padding: 0.5rem 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: '▸'; font-size: 10px; transition: transform 0.2s; }
+  details[open] summary::before { transform: rotate(90deg); }
+
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-num { color: var(--muted); min-width: 20px; font-size: 11px; }
+
+  .done-screen {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+  .done-screen .trophy {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 4rem;
+    color: var(--work);
+    margin-bottom: 1rem;
+  }
+  .done-screen h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .done-screen p { color: var(--muted); font-size: 13px; margin-bottom: 1.5rem; }
+  .done-screen button { margin: 0 auto; max-width: 260px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="title">Warmup<span>.</span>flow</div>
+    <label class="sound-toggle">
+      <input type="checkbox" id="sound-toggle" checked>
+      <span class="toggle-pill"></span>
+      <span id="sound-label">sound on</span>
+    </label>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Move</div><div class="stat-val" id="stat-ex">1/5</div></div>
+    <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-val" id="stat-time">0:00</div></div>
+  </div>
+
+  <div class="move-dots">
+    <span class="label">MOVES</span>
+    <div id="move-dots"></div>
+  </div>
+
+  <div class="main-card" id="main-card">
+    <div class="phase-pill" id="phase-pill">READY</div>
+    <div class="ex-name" id="ex-name">Ankle circles</div>
+    <div class="tags" id="tags"></div>
+    <div class="countdown-row">
+      <div class="countdown" id="countdown">2:00</div>
+      <div class="next-label" id="next-label"></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:100%;"></div></div>
+    <div class="tip" id="tip">Both directions, extra time on the left ankle. Slow, full range of motion.</div>
+  </div>
+
+  <div class="controls">
+    <button id="btn-start" onclick="startPause()">▶ &nbsp;Start</button>
+    <button onclick="resetAll()">↺ &nbsp;Reset</button>
+  </div>
+
+  <details>
+    <summary>all moves</summary>
+    <div id="full-list"></div>
+  </details>
+</div>
+
+<script>
+const exercises = [
+  { name:"Ankle circles",              tags:["ankle"],  tip:"Both directions, extra time on the left ankle. Slow, full range of motion." },
+  { name:"Leg swings front-to-back",    tags:["hip"],    tip:"Hold a wall for balance. Swing each leg front-to-back, then switch. Let the range grow gradually." },
+  { name:"Walking lunges with a twist", tags:["hip","core"], tip:"Step into a lunge, rotate your torso toward the front leg, step through to the next lunge." },
+  { name:"Standing hip circles",        tags:["hip"],    tip:"Hands on hips, big controlled circles. Half the time each direction." },
+  { name:"Deep squat hold with reach",  tags:["ankle","hip"], tip:"Sink into a low squat, heels down. Reach one arm up and rotate open, then the other side." },
+];
+
+const tagColors = {
+  ankle: { bg:"rgba(90,180,245,0.12)",  color:"#5ab4f5", border:"rgba(90,180,245,0.3)"  },
+  hip:   { bg:"rgba(90,245,180,0.12)",  color:"#5af5b4", border:"rgba(90,245,180,0.3)"  },
+  core:  { bg:"rgba(167,139,250,0.12)", color:"#a78bfa", border:"rgba(167,139,250,0.3)" },
+};
+const tagLabel = { ankle:"Ankle mobility", hip:"Hip mobility", core:"Core/rotation" };
+
+const WORK=120, TOTAL_MOVES=5;
+let exIdx=0, phase="idle", remaining=WORK, totalElapsed=0;
+let timerInt=null, started=false;
+let audioCtx=null;
+
+function getAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+
+function beep(freq,dur,vol,delay){
+  try {
+    const ctx=getAudio(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type="sine"; o.frequency.value=freq;
+    const t=ctx.currentTime+delay;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.01);
+    g.gain.linearRampToValueAtTime(0,t+dur);
+    o.start(t); o.stop(t+dur+0.05);
+  } catch(e){}
+}
+
+function playSound(type){
+  if(!document.getElementById("sound-toggle").checked) return;
+  if(type==="next")  { beep(880,0.12,0.35,0); beep(1100,0.18,0.35,0.15); }
+  if(type==="warn")  { beep(880,0.08,0.2,0); beep(880,0.08,0.2,0.15); beep(880,0.08,0.2,0.3); }
+  if(type==="done")  { [0,0.18,0.36,0.56].forEach((d,i)=>beep([880,1100,1320,1760][i],0.2,0.3,d)); }
+}
+
+function fmt(s){ return Math.floor(s/60)+":"+(s%60<10?"0":"")+s%60; }
+
+function tags2html(tags){
+  return tags.map(t=>{
+    const c=tagColors[t]||{bg:"",color:"#888",border:"#888"};
+    return `<span class="tag" style="background:${c.bg};color:${c.color};border-color:${c.border};">${tagLabel[t]||t}</span>`;
+  }).join("");
+}
+
+function updateUI(){
+  const ex=exercises[exIdx];
+
+  document.getElementById("ex-name").textContent = ex.name;
+  document.getElementById("tags").innerHTML       = tags2html(ex.tags);
+  document.getElementById("tip").textContent      = ex.tip;
+
+  const pct = Math.round(remaining/WORK*100);
+
+  document.getElementById("countdown").textContent = fmt(remaining);
+  document.getElementById("progress-fill").style.width = pct+"%";
+
+  document.getElementById("phase-pill").textContent = phase==="idle" ? "READY" : "GO";
+
+  document.getElementById("stat-ex").textContent=(exIdx+1)+"/"+TOTAL_MOVES;
+  document.getElementById("stat-time").textContent=fmt(totalElapsed);
+
+  const dc=document.getElementById("move-dots");
+  dc.innerHTML="";
+  for(let i=0;i<TOTAL_MOVES;i++){
+    const d=document.createElement("div"); d.className="dot";
+    if(i<exIdx) d.classList.add("done"); else if(i===exIdx) d.classList.add("active");
+    dc.appendChild(d);
+  }
+  dc.style.display="flex"; dc.style.gap="6px";
+
+  const ni=exIdx+1;
+  document.getElementById("next-label").textContent = ni<exercises.length ? "next → "+exercises[ni].name : "next → done!";
+}
+
+function advance(){
+  exIdx++;
+  if(exIdx>=exercises.length){ endWorkout(); return; }
+  remaining=WORK; playSound("next");
+  updateUI();
+}
+
+function tick(){ remaining--; totalElapsed++; if(remaining===5) playSound("warn"); if(remaining<=0) advance(); else updateUI(); }
+
+function endWorkout(){
+  clearInterval(timerInt); playSound("done");
+  document.querySelector(".container").innerHTML=`
+    <div class="done-screen">
+      <div class="trophy">✦</div>
+      <h2>Warmup complete</h2>
+      <p>5 moves &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
+      <button onclick="location.reload()" style="max-width:200px;">↺ &nbsp;Start over</button>
+    </div>`;
+}
+
+function startPause(){
+  if(!started){
+    started=true; phase="go"; remaining=WORK;
+    document.getElementById("btn-start").innerHTML="⏸ &nbsp;Pause";
+    document.getElementById("btn-start").style.background="rgba(143,174,106,0.08)";
+    playSound("next"); updateUI();
+    timerInt=setInterval(tick,1000);
+  } else if(timerInt){
+    clearInterval(timerInt); timerInt=null;
+    document.getElementById("btn-start").innerHTML="▶ &nbsp;Resume";
+  } else {
+    timerInt=setInterval(tick,1000);
+    document.getElementById("btn-start").innerHTML="⏸ &nbsp;Pause";
+  }
+}
+
+function resetAll(){
+  clearInterval(timerInt); timerInt=null; started=false;
+  exIdx=0; phase="idle"; remaining=WORK; totalElapsed=0;
+  document.getElementById("btn-start").innerHTML="▶ &nbsp;Start";
+  document.getElementById("btn-start").style.background="var(--work-dim)";
+  updateUI();
+  document.getElementById("next-label").textContent="";
+  document.getElementById("phase-pill").textContent="READY";
+}
+
+document.getElementById("sound-toggle").addEventListener("change",function(){
+  document.getElementById("sound-label").textContent=this.checked?"sound on":"sound off";
+});
+
+(function buildList(){
+  document.getElementById("full-list").innerHTML=exercises.map((e,i)=>`
+    <div class="list-item">
+      <span class="list-num">${i+1}</span>
+      <span style="flex:1;">${e.name}</span>
+      <span style="display:flex;gap:4px;">${tags2html(e.tags)}</span>
+    </div>`).join("");
+})();
+
+resetAll();
+</script>
+</body>
+</html>
