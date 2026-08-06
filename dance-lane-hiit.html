@@ -327,14 +327,9 @@
   <div class="lane-note">Every move travels. Use the full <b>19ft</b> down and back, and the full <b>5ft</b> of width where it helps. Wall or counter within reach for the one-foot work.</div>
 
   <div class="stats-row">
-    <div class="stat"><div class="stat-label">Circuit</div><div class="stat-val" id="stat-circuit">1/3</div></div>
-    <div class="stat"><div class="stat-label">Exercise</div><div class="stat-val" id="stat-ex">1/10</div></div>
+    <div class="stat"><div class="stat-label">Move</div><div class="stat-val" id="stat-ex">1/10</div></div>
     <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-val" id="stat-time">0:00</div></div>
-  </div>
-
-  <div class="circuit-dots">
-    <span class="label">CIRCUITS</span>
-    <div id="circuit-dots"></div>
+    <div class="stat"><div class="stat-label">Left</div><div class="stat-val" id="stat-left">30:00</div></div>
   </div>
 
   <div class="main-card" id="main-card">
@@ -342,12 +337,12 @@
     <div class="ex-name" id="ex-name">Rolling grapevine</div>
     <div class="tags" id="tags"></div>
     <div class="countdown-row">
-      <div class="countdown" id="countdown" style="color:#a855f7;">60</div>
+      <div class="countdown" id="countdown" style="color:#a855f7;">2:30</div>
       <div class="next-label" id="next-label"></div>
     </div>
     <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:100%;"></div></div>
-    <div style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:0.75rem;" id="phase-sub">60s work · 20s rest</div>
-    <div class="tip" id="tip">30s each direction. Cross front, open, cross back, open, traveling down the lane instead of staying put.</div>
+    <div style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:0.75rem;" id="phase-sub">2:30 work · 30s rest</div>
+    <div class="tip" id="tip">75s each direction. Cross front, open, cross back, open, traveling down the lane instead of staying put.</div>
   </div>
 
   <div class="controls">
@@ -355,10 +350,9 @@
     <button onclick="resetAll()">↺ &nbsp;Reset</button>
   </div>
 
-  <div class="legend">
-    <div class="legend-item"><span class="legend-dot" style="background:#a855f7;"></span>Work 60s</div>
-    <div class="legend-item"><span class="legend-dot" style="background:#f5a623;"></span>Rest 20s</div>
-    <div class="legend-item"><span class="legend-dot" style="background:#5ab4f5;"></span>Break 60s</div>
+  <div class="legend" style="grid-template-columns:repeat(2,1fr);">
+    <div class="legend-item"><span class="legend-dot" style="background:#a855f7;"></span>Work 2:30</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f5a623;"></span>Rest 30s</div>
   </div>
 
   <details>
@@ -369,14 +363,14 @@
 
 <script>
 const exercises = [
-  { name:"Rolling grapevine",            tags:["rolling","coord"],    tip:"30s each direction. Cross front, open, cross back, open, traveling down the lane instead of staying put." },
+  { name:"Rolling grapevine",            tags:["rolling","coord"],    tip:"75s each direction. Cross front, open, cross back, open, traveling down the lane instead of staying put." },
   { name:"Camel walk",                   tags:["rolling","edges"],    tip:"Small, fast bubbles. Toes out and spread, toes in and close. Feet never leave the floor, knees stay soft." },
-  { name:"Single-foot heel-toe rocks",   tags:["balance","coord"],    tip:"40s left foot working, 20s right. One foot flat and loaded, the other alternating heel up then toe up while you roll." },
+  { name:"Single-foot heel-toe rocks",   tags:["balance","coord"],    tip:"100s left foot working, 50s right. One foot flat and loaded, the other alternating heel up then toe up while you roll." },
   { name:"Crazy legs",                   tags:["rolling","coord"],    tip:"Feet scissor apart and together as you roll, one forward and one back. Left leg leading for the second half." },
   { name:"Backward strut",               tags:["rolling","balance"],  tip:"Toe-out push traveling backward. Knees soft, chest up, glance over your shoulder to check your line." },
   { name:"Cha-cha down the lane",        tags:["rolling","coord"],    tip:"Roll forward, transition, roll backward, transition. Hold the groove and keep covering ground the whole time." },
-  { name:"One-foot glide, left bias",    tags:["balance"],            tip:"40s left, 20s right. One push, then glide the length of the lane. Low stance, free leg quiet, no flailing." },
-  { name:"Traveling crossovers",         tags:["rolling","coord"],    tip:"30s each direction. Cross the outside foot over, push with the back leg, uncross, repeat down the lane." },
+  { name:"One-foot glide, left bias",    tags:["balance"],            tip:"100s left, 50s right. One push, then glide the length of the lane. Low stance, free leg quiet, no flailing." },
+  { name:"Traveling crossovers",         tags:["rolling","coord"],    tip:"75s each direction. Cross the outside foot over, push with the back leg, uncross, repeat down the lane." },
   { name:"Slalom edges",                 tags:["edges","rolling"],    tip:"S curves using the full 5ft of width. Knees drive the edge changes, shoulders stay pointed down the lane." },
   { name:"Low bounce groove",            tags:["groove","hip"],       tip:"Rolling slow, knees bent, bouncing to a beat with hip circles. Loosen the hips and finish on rhythm." },
 ];
@@ -393,7 +387,8 @@ const tagLabel = { rolling:"Rolling", coord:"Coordination", edges:"Edges", balan
 
 const phaseColors = { work:"#a855f7", rest:"#f5a623", break:"#5ab4f5", idle:"#a855f7" };
 
-const WORK=60, REST=20, BREAK=60, CIRCUITS=3;
+const WORK=150, REST=30, BREAK=60, CIRCUITS=1;
+const SESSION=(WORK+REST)*10;
 let circuit=0, exIdx=0, phase="idle", remaining=WORK, totalElapsed=0;
 let timerInt=null, started=false;
 let audioCtx=null;
@@ -450,7 +445,7 @@ function updateUI(){
   const total  = phase==="work"?WORK : phase==="rest"?REST : BREAK;
   const pct    = Math.round(remaining/total*100);
 
-  document.getElementById("countdown").textContent = remaining;
+  document.getElementById("countdown").textContent = fmt(remaining);
   document.getElementById("countdown").style.color = color;
   document.getElementById("progress-fill").style.width = pct+"%";
 
@@ -461,21 +456,12 @@ function updateUI(){
   pill.style.color=color;
   pill.style.borderColor=`${color}4d`;
 
-  document.getElementById("stat-circuit").textContent=(circuit+1)+"/"+CIRCUITS;
   document.getElementById("stat-ex").textContent=(exIdx+1)+"/10";
   document.getElementById("stat-time").textContent=fmt(totalElapsed);
-
-  const dc=document.getElementById("circuit-dots");
-  dc.innerHTML="";
-  for(let i=0;i<CIRCUITS;i++){
-    const d=document.createElement("div"); d.className="dot";
-    if(i<circuit) d.classList.add("done"); else if(i===circuit) d.classList.add("active");
-    dc.appendChild(d);
-  }
-  dc.style.display="flex"; dc.style.gap="6px";
+  document.getElementById("stat-left").textContent=fmt(Math.max(0,SESSION-totalElapsed));
 
   let next="";
-  if(phase==="work") next="next → 20s rest";
+  if(phase==="work") next="next → 30s rest";
   else if(phase==="rest"){ const ni=exIdx+1; if(ni<exercises.length) next="next → "+exercises[ni].name; else if(circuit+1<CIRCUITS) next="next → circuit break"; else next="next → done!"; }
   else if(phase==="break") next="next → "+exercises[0].name;
   document.getElementById("next-label").textContent=next;
@@ -501,7 +487,7 @@ function advance(){
 
 function tick(){
   remaining--; totalElapsed++;
-  if(phase==="work" && remaining===30) playSound("half");
+  if(phase==="work" && remaining===Math.floor(WORK/2)) playSound("half");
   if(remaining===3) playSound("warn");
   if(remaining<=0) advance(); else updateUI();
 }
@@ -512,7 +498,7 @@ function endWorkout(){
     <div class="done-screen">
       <div class="trophy">✦</div>
       <h2>Workout complete</h2>
-      <p>3 circuits &nbsp;·&nbsp; 30 moves &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
+      <p>10 moves &nbsp;·&nbsp; 2:30 each &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
       <button onclick="location.reload()" style="max-width:200px;">↺ &nbsp;Start over</button>
     </div>`;
 }
@@ -540,7 +526,7 @@ function resetAll(){
   document.getElementById("btn-start").style.background="var(--work-dim)";
   setPhaseColor("#a855f7");
   updateUI();
-  document.getElementById("countdown").textContent="60";
+  document.getElementById("countdown").textContent=fmt(WORK);
   document.getElementById("next-label").textContent="";
   document.getElementById("phase-pill").textContent="READY";
 }
