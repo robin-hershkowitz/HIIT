@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noodle + Strength</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e0f;
+    --surface: #1a1a1c;
+    --surface2: #242426;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8;
+    --muted: #7a7875;
+    --work: #ef5a86;
+    --work-dim: rgba(239,90,134,0.12);
+    --noodle: #5ab4f5;
+    --noodle-dim: rgba(90,180,245,0.12);
+    --cool: #7ad9a8;
+    --cool-dim: rgba(122,217,168,0.12);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container { width: 100%; max-width: 480px; }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .title span { color: var(--work); }
+
+  .sound-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--muted);
+    cursor: pointer; user-select: none;
+  }
+  .sound-toggle input { display: none; }
+  .toggle-pill {
+    width: 32px; height: 18px;
+    background: var(--surface2);
+    border-radius: 9px;
+    position: relative;
+    border: 1px solid var(--border2);
+    transition: background 0.2s;
+  }
+  .toggle-pill::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: left 0.2s, background 0.2s;
+  }
+  .sound-toggle input:checked + .toggle-pill { background: var(--work-dim); border-color: var(--work); }
+  .sound-toggle input:checked + .toggle-pill::after { left: 17px; background: var(--work); }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+  }
+  .stat-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .stat-val   { font-size: 20px; font-weight: 500; color: var(--text); }
+
+  .circuit-dots {
+    display: flex; gap: 6px; margin-bottom: 1.25rem; align-items: center;
+  }
+  .circuit-dots .label { font-size: 11px; color: var(--muted); margin-right: 4px; letter-spacing: 0.06em; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); transition: all 0.3s; }
+  .dot.active { background: var(--work); border-color: var(--work); box-shadow: 0 0 8px rgba(239,90,134,0.5); }
+  .dot.done   { background: var(--muted); border-color: var(--muted); }
+
+  .main-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .main-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--phase-color, var(--work));
+    transition: background 0.4s;
+  }
+
+  .phase-pill {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s;
+  }
+
+  .ex-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+  .tag {
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    background: var(--surface2);
+  }
+
+  .progress-wrap {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-bottom: 0.4rem;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--phase-color, var(--work));
+    transition: width 0.5s linear, background 0.4s;
+  }
+
+  .countdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+  }
+  .countdown {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    line-height: 1;
+    transition: color 0.3s;
+  }
+  .next-label { font-size: 11px; color: var(--muted); text-align: right; max-width: 190px; line-height: 1.4; }
+
+  .tip {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    border-left: 2px solid var(--border2);
+    padding-left: 10px;
+  }
+  .tip.ankle { border-left-color: var(--work); }
+
+  .controls { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 8px; margin-bottom: 0.6rem; }
+  .controls-secondary { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 1.5rem; }
+
+  button {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  button:hover { background: var(--surface2); border-color: rgba(255,255,255,0.2); }
+  button:active { transform: scale(0.97); }
+  button:focus-visible { outline: 2px solid var(--work); outline-offset: 2px; }
+  button:disabled { opacity: 0.35; cursor: default; }
+  button:disabled:hover { background: var(--surface); border-color: var(--border2); }
+
+  #btn-start {
+    background: var(--work-dim);
+    border-color: var(--work);
+    color: var(--work);
+  }
+  #btn-start:hover { background: rgba(239,90,134,0.2); }
+
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 1.5rem;
+  }
+  .legend-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 11px;
+  }
+  .legend-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
+
+  details { margin-top: 0.5rem; }
+  summary {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    padding: 0.5rem 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: '▸'; font-size: 10px; transition: transform 0.2s; }
+  details[open] summary::before { transform: rotate(90deg); }
+
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item.current { color: var(--work); }
+  .list-num { color: var(--muted); min-width: 24px; font-size: 11px; }
+  .list-dur { color: var(--muted); font-size: 11px; }
+
+  .done-screen { text-align: center; padding: 3rem 1rem; }
+  .done-screen .trophy {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 4rem;
+    color: var(--work);
+    margin-bottom: 1rem;
+  }
+  .done-screen h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+  .done-screen p { color: var(--muted); font-size: 13px; margin-bottom: 1.5rem; }
+  .done-screen button { margin: 0 auto; max-width: 260px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="title">Noodle<span>+</span>strength</div>
+    <label class="sound-toggle">
+      <input type="checkbox" id="sound-toggle" checked>
+      <span class="toggle-pill"></span>
+      <span id="sound-label">sound on</span>
+    </label>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Block</div><div class="stat-val" id="stat-block">1/15</div></div>
+    <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-val" id="stat-time">0:00</div></div>
+    <div class="stat"><div class="stat-label">Left</div><div class="stat-val" id="stat-left">30:00</div></div>
+  </div>
+
+  <div class="circuit-dots">
+    <span class="label">STRENGTH SETS</span>
+    <div id="circuit-dots" style="display:flex;gap:6px;"></div>
+  </div>
+
+  <div class="main-card">
+    <div class="phase-pill" id="phase-pill">READY</div>
+    <div class="ex-name" id="ex-name">Noodle</div>
+    <div class="tags" id="tags"></div>
+    <div class="countdown-row">
+      <div class="countdown" id="countdown">3:00</div>
+      <div class="next-label" id="next-label"></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:100%;"></div></div>
+    <div style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:0.75rem;" id="phase-sub">3 min noodle · chime at 2:30</div>
+    <div class="tip" id="tip">Skate however you want. Music on, roll the lane, mess around.</div>
+  </div>
+
+  <div class="controls">
+    <button id="btn-back" onclick="goBack()" title="Previous block">◀ &nbsp;Back</button>
+    <button id="btn-start" onclick="startPause()">▶ &nbsp;Start</button>
+    <button id="btn-next" onclick="goNext()" title="Next block">Skip &nbsp;▶</button>
+  </div>
+  <div class="controls-secondary">
+    <button onclick="resetAll()">↺ &nbsp;Reset</button>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#5ab4f5;"></span>Noodle 3:00</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#ef5a86;"></span>Strength 1:00</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#7ad9a8;"></span>Cool 2:00</div>
+  </div>
+
+  <details>
+    <summary>all blocks</summary>
+    <div id="full-list"></div>
+  </details>
+</div>
+
+<script>
+const NOODLE = 180, STRENGTH = 60, COOL = 120, CHIME_AT = 30;
+
+const noodleTips = [
+  "Skate however you want. Music on, roll the lane, mess around.",
+  "Easy laps of the lane. Let your legs stay warm and loose.",
+  "Play with edges. Lean in, lean out, see what the wheels do.",
+  "Roll low if you feel like it. Nothing to prove in this block.",
+  "Try a few things you are bad at, no pressure to land them.",
+  "Keep it moving but keep it easy. Breathing should stay conversational.",
+  "Last long noodle. Save something for the final set."
+];
+
+const strength = [
+  { name:"Curl + overhead press, rolling",
+    tags:["weights","upper"],
+    tip:"2 lb. Roll the lane slowly while you curl and press overhead. The point is keeping your arms working while your legs keep rolling." },
+  { name:"Low stance hold + weight reach",
+    tags:["weights","low"],
+    tip:"2 lb. Drop into derby stance and hold it. Press both weights straight out in front of you. The reach pulls your chest up so you stop folding at the waist." },
+  { name:"Rolling lunge glides",
+    tags:["weights","scissor","ankle"],
+    tip:"30s left leg forward, 30s right. Push off, settle into a long split stance, lower the back knee slowly while the front skate keeps rolling. Wall hand is fine. Skip to a stationary split stance hold if the left ankle is talking to you." },
+  { name:"Weighted wood chops",
+    tags:["weights","rotation"],
+    tip:"Both hands on one 2 lb weight. Feet wide and still. Swing from low outside hip up to the opposite shoulder, 30s each way. This is the rotation you use to look behind you without your feet wandering." },
+  { name:"Plow width squat pulses",
+    tags:["weights","low","plow"],
+    tip:"2 lb at your chest. Set your feet in plow position, toes in, and pulse a few inches up and down. Inner thighs are what actually make a plow stop stop you." },
+  { name:"Single-leg balance + reach",
+    tags:["balance","ankle"],
+    tip:"35s left foot, 25s right. One skate up, one 2 lb weight reaching slowly forward and across your body. Light wall touch allowed. The reach forces small ankle corrections instead of a frozen hold." },
+  { name:"Scissor holds",
+    tags:["weights","scissor"],
+    tip:"2 lb at your chest. 30s left foot forward, 30s right. Roll into the scissor and hold the shape rather than pumping it. Weight at your chest keeps you centered." }
+];
+
+const blocks = [];
+for (let i = 0; i < 7; i++) {
+  blocks.push({ type:"noodle", name:"Noodle", dur:NOODLE, tags:["easy skate"], tip:noodleTips[i] });
+  blocks.push({ type:"strength", name:strength[i].name, dur:STRENGTH, tags:strength[i].tags, tip:strength[i].tip });
+}
+blocks.push({ type:"cool", name:"Easy roll out", dur:COOL, tags:["cool down"], tip:"Slow laps. Let your heart rate come down before you sit on the floor to unlace." });
+
+const tagColors = {
+  "weights":   { bg:"rgba(245,90,90,0.12)",   color:"#f55a5a", border:"rgba(245,90,90,0.3)"   },
+  "upper":     { bg:"rgba(167,139,250,0.12)", color:"#a78bfa", border:"rgba(167,139,250,0.3)" },
+  "low":       { bg:"rgba(200,245,90,0.12)",  color:"#c8f55a", border:"rgba(200,245,90,0.3)"  },
+  "scissor":   { bg:"rgba(90,245,180,0.12)",  color:"#5af5b4", border:"rgba(90,245,180,0.3)"  },
+  "rotation":  { bg:"rgba(245,166,35,0.12)",  color:"#f5a623", border:"rgba(245,166,35,0.3)"  },
+  "plow":      { bg:"rgba(90,180,245,0.12)",  color:"#5ab4f5", border:"rgba(90,180,245,0.3)"  },
+  "balance":   { bg:"rgba(122,217,168,0.12)", color:"#7ad9a8", border:"rgba(122,217,168,0.3)" },
+  "ankle":     { bg:"rgba(239,90,134,0.12)",  color:"#ef5a86", border:"rgba(239,90,134,0.3)"  },
+  "easy skate":{ bg:"rgba(90,180,245,0.12)",  color:"#5ab4f5", border:"rgba(90,180,245,0.3)"  },
+  "cool down": { bg:"rgba(122,217,168,0.12)", color:"#7ad9a8", border:"rgba(122,217,168,0.3)" }
+};
+const tagLabel = {
+  "weights":"2 lb weights", "upper":"Upper body", "low":"Get low", "scissor":"Scissoring",
+  "rotation":"Rotation", "plow":"Plow", "balance":"Balance", "ankle":"Left ankle",
+  "easy skate":"Free skate", "cool down":"Cool down"
+};
+const phaseColors = { noodle:"#5ab4f5", strength:"#ef5a86", cool:"#7ad9a8" };
+
+const TOTAL = blocks.reduce((a,b)=>a+b.dur,0);
+let idx = 0, remaining = blocks[0].dur, elapsed = 0;
+let timerInt = null, started = false, chimed = false;
+let audioCtx = null;
+
+function getAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+
+function beep(freq,dur,vol,delay){
+  try {
+    const ctx=getAudio(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type="sine"; o.frequency.value=freq;
+    const t=ctx.currentTime+delay;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.01);
+    g.gain.linearRampToValueAtTime(0,t+dur);
+    o.start(t); o.stop(t+dur+0.05);
+  } catch(e){}
+}
+
+function playSound(type){
+  if(!document.getElementById("sound-toggle").checked) return;
+  if(type==="strength") { beep(880,0.12,0.35,0); beep(1100,0.18,0.35,0.15); }
+  if(type==="noodle")   { beep(520,0.2,0.25,0); beep(660,0.22,0.25,0.18); }
+  if(type==="cool")     { beep(440,0.15,0.25,0); beep(440,0.15,0.25,0.2); beep(440,0.15,0.25,0.4); }
+  if(type==="chime")    { beep(1320,0.25,0.22,0); }
+  if(type==="warn")     { beep(880,0.08,0.2,0); beep(880,0.08,0.2,0.15); beep(880,0.08,0.2,0.3); }
+  if(type==="done")     { [0,0.18,0.36,0.56].forEach((d,i)=>beep([880,1100,1320,1760][i],0.2,0.3,d)); }
+}
+
+function fmt(s){ return Math.floor(s/60)+":"+(s%60<10?"0":"")+s%60; }
+
+function tags2html(tags){
+  return tags.map(t=>{
+    const c=tagColors[t]||{bg:"",color:"#888",border:"#888"};
+    return `<span class="tag" style="background:${c.bg};color:${c.color};border-color:${c.border};">${tagLabel[t]||t}</span>`;
+  }).join("");
+}
+
+function elapsedBefore(i){ return blocks.slice(0,i).reduce((a,b)=>a+b.dur,0); }
+
+function updateUI(){
+  const b = blocks[idx];
+  const color = phaseColors[b.type];
+  document.documentElement.style.setProperty("--phase-color", color);
+
+  document.getElementById("ex-name").textContent = b.name;
+  document.getElementById("tags").innerHTML = tags2html(b.tags);
+
+  const tipEl = document.getElementById("tip");
+  tipEl.textContent = b.tip;
+  tipEl.className = b.tags.includes("ankle") ? "tip ankle" : "tip";
+
+  document.getElementById("countdown").textContent = fmt(remaining);
+  document.getElementById("countdown").style.color = color;
+  document.getElementById("progress-fill").style.width = Math.round(remaining/b.dur*100)+"%";
+
+  const label = b.type==="strength" ? "STRENGTH" : b.type==="cool" ? "COOL DOWN" : "NOODLE";
+  const pill = document.getElementById("phase-pill");
+  pill.textContent = started ? label : "READY";
+  pill.style.background = `${color}1e`;
+  pill.style.color = color;
+  pill.style.border = `1px solid ${color}4d`;
+
+  document.getElementById("phase-sub").textContent =
+    b.type==="noodle" ? "3 min noodle · chime at 2:30"
+    : b.type==="strength" ? "1 min · 2 lb weights"
+    : "2 min easy roll out";
+
+  document.getElementById("stat-block").textContent = (idx+1)+"/"+blocks.length;
+  document.getElementById("stat-time").textContent = fmt(elapsed);
+  document.getElementById("stat-left").textContent = fmt(TOTAL - elapsed);
+
+  const setsDone = blocks.slice(0, idx+1).filter(x=>x.type==="strength").length;
+  const inSet = blocks[idx].type==="strength";
+  const dc = document.getElementById("circuit-dots");
+  dc.innerHTML = "";
+  for(let i=0;i<7;i++){
+    const d=document.createElement("div"); d.className="dot";
+    if(i < setsDone - (inSet?1:0)) d.classList.add("done");
+    else if(inSet && i === setsDone-1) d.classList.add("active");
+    dc.appendChild(d);
+  }
+
+  const nx = blocks[idx+1];
+  document.getElementById("next-label").textContent = nx ? "next → "+nx.name : "next → done!";
+
+  document.getElementById("btn-back").disabled = (idx===0 && remaining===blocks[0].dur);
+  document.getElementById("btn-next").disabled = (idx>=blocks.length-1);
+
+  document.querySelectorAll(".list-item").forEach((el,i)=>{
+    el.classList.toggle("current", i===idx);
+  });
+}
+
+function enterBlock(i, playCue){
+  idx = i;
+  remaining = blocks[idx].dur;
+  elapsed = elapsedBefore(idx);
+  chimed = false;
+  if(playCue) playSound(blocks[idx].type);
+  updateUI();
+}
+
+function advance(){
+  if(idx >= blocks.length-1){ endWorkout(); return; }
+  enterBlock(idx+1, true);
+}
+
+function goNext(){ if(idx < blocks.length-1) enterBlock(idx+1, started); }
+
+function goBack(){
+  // partway through a block: restart it. At the top of a block: go to the previous one.
+  if(remaining < blocks[idx].dur) enterBlock(idx, false);
+  else if(idx > 0) enterBlock(idx-1, false);
+}
+
+function tick(){
+  remaining--; elapsed++;
+  const b = blocks[idx];
+  if((b.type==="noodle" || b.type==="cool") && remaining===CHIME_AT && !chimed){ chimed=true; playSound("chime"); }
+  if(b.type==="strength" && remaining===30) playSound("chime");
+  if(remaining===3) playSound("warn");
+  if(remaining<=0) advance(); else updateUI();
+}
+
+function endWorkout(){
+  clearInterval(timerInt);
+  playSound("done");
+  document.querySelector(".container").innerHTML=`
+    <div class="done-screen">
+      <div class="trophy">✦</div>
+      <h2>Workout complete</h2>
+      <p>7 noodle blocks &nbsp;·&nbsp; 7 strength sets &nbsp;·&nbsp; ${fmt(TOTAL)} total</p>
+      <button onclick="location.reload()" style="max-width:200px;">↺ &nbsp;Start over</button>
+    </div>`;
+}
+
+function startPause(){
+  if(!started){
+    started = true;
+    document.getElementById("btn-start").innerHTML="⏸ &nbsp;Pause";
+    playSound(blocks[idx].type);
+    updateUI();
+    timerInt=setInterval(tick,1000);
+  } else if(timerInt){
+    clearInterval(timerInt); timerInt=null;
+    document.getElementById("btn-start").innerHTML="▶ &nbsp;Resume";
+  } else {
+    timerInt=setInterval(tick,1000);
+    document.getElementById("btn-start").innerHTML="⏸ &nbsp;Pause";
+  }
+}
+
+function resetAll(){
+  clearInterval(timerInt); timerInt=null; started=false;
+  document.getElementById("btn-start").innerHTML="▶ &nbsp;Start";
+  enterBlock(0,false);
+}
+
+document.getElementById("sound-toggle").addEventListener("change",function(){
+  document.getElementById("sound-label").textContent=this.checked?"sound on":"sound off";
+});
+
+(function buildList(){
+  document.getElementById("full-list").innerHTML=blocks.map((b,i)=>`
+    <div class="list-item">
+      <span class="list-num">${i+1}</span>
+      <span style="flex:1;">${b.name}</span>
+      <span class="list-dur">${fmt(b.dur)}</span>
+    </div>`).join("");
+})();
+
+resetAll();
+</script>
+</body>
+</html>
