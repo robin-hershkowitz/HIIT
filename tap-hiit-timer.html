@@ -174,6 +174,19 @@
   .list-num { color: var(--muted); min-width: 20px; font-size: 11px; }
   .list-counts { color: var(--work); font-size: 11px; letter-spacing: 0.06em; }
 
+  .gloss { padding: 0.3rem 0 0.6rem; }
+  .gloss-group { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0.9rem 0 0.4rem; }
+  .gloss-group:first-child { margin-top: 0.2rem; }
+  .gloss-item { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; line-height: 1.6; }
+  .gloss-item:last-child { border-bottom: none; }
+  .gloss-term { color: var(--work); min-width: 110px; flex-shrink: 0; }
+  .gloss-def { color: var(--muted); }
+  .gloss-def b { color: var(--text); font-weight: 500; }
+  @media (max-width: 420px) {
+    .gloss-item { flex-direction: column; gap: 2px; }
+    .gloss-term { min-width: 0; }
+  }
+
   .stretch-list { font-size: 12px; color: var(--muted); line-height: 1.8; padding: 0.4rem 0 0.6rem; }
   .stretch-list b { color: var(--text); font-weight: 500; }
 
@@ -200,6 +213,54 @@
   </div>
 
   <div class="floor-note">Hard floor, tap shoes, <b>19ft x 5ft</b> lane. Traveling moves go down and back; everything else stays in one spot. Keep a wall or counter within reach for the one-foot work.</div>
+
+  <details>
+    <summary>glossary</summary>
+    <div class="gloss">
+
+      <div class="gloss-group">The two things every move is made of</div>
+      <div class="gloss-item"><span class="gloss-term">Step</span><span class="gloss-def">Putting a foot down and <b>giving it your weight</b>. If it takes weight, it is a step.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Tap / touch</span><span class="gloss-def">Putting a foot down and <b>not</b> giving it your weight. Makes a sound, changes nothing about your balance.</span></div>
+
+      <div class="gloss-group">Single sounds</div>
+      <div class="gloss-item"><span class="gloss-term">Brush</span><span class="gloss-def">Swing the leg forward and let the ball tap graze the floor on the way through. One sound, no weight.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Spank</span><span class="gloss-def">The same thing backwards: the foot brushes the floor moving behind you.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Scuff</span><span class="gloss-def">A brush forward made with the heel tap instead of the ball.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Dig</span><span class="gloss-def">Driving the heel or toe into the floor for a sharp, deliberate sound. No weight.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Heel drop</span><span class="gloss-def">Standing on the ball of the foot, drop the heel to the floor. Also called a heel.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Toe drop</span><span class="gloss-def">Standing on the heel, drop the toe tap down.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Stomp / stamp</span><span class="gloss-def">The whole flat foot striking the floor. One of the two takes your weight and the other does not, and <b>schools disagree about which is which</b>, so use your teacher's naming.</span></div>
+
+      <div class="gloss-group">Two sounds</div>
+      <div class="gloss-item"><span class="gloss-term">Shuffle</span><span class="gloss-def">Brush forward, brush back, same foot. Two sounds, no weight on that foot at any point.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Flap</span><span class="gloss-def">Brush forward, then step onto that same foot. Two sounds, and <b>your weight moves</b>. This is how tap travels.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Slap</span><span class="gloss-def">A flap that does not take the weight: brush forward and land on the ball, but stay back over the other foot. Flap moves you, slap does not. Some teachers use the names the other way around.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Ball change</span><span class="gloss-def">Two fast weight shifts between the balls of both feet, back foot then front foot. Pure weight transfer.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Step heel</span><span class="gloss-def">Step onto the ball, then drop that heel. The everyday walking rhythm of tap.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Riff</span><span class="gloss-def">One leg swing, several sounds. The basic version is brush forward plus heel scuff.</span></div>
+
+      <div class="gloss-group">Getting off the floor</div>
+      <div class="gloss-item"><span class="gloss-term">Hop</span><span class="gloss-def">Leave one foot, land on the <b>same</b> foot.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Leap</span><span class="gloss-def">Leave one foot, land on the <b>other</b> foot.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Jump</span><span class="gloss-def">Leave both feet, land on both feet.</span></div>
+
+      <div class="gloss-group">Combinations</div>
+      <div class="gloss-item"><span class="gloss-term">Shuffle ball change</span><span class="gloss-def">Shuffle one foot, then a ball change. You are balanced on one leg through the whole shuffle.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Cramp roll</span><span class="gloss-def">Four sounds in place: right toe, left toe, right heel, left heel. Ends with you on both flat feet.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Paradiddle</span><span class="gloss-def">A cramp roll with an uneven pattern borrowed from drumming. Same idea, trickier order.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Chug</span><span class="gloss-def">On one flat foot, lift the heel slightly and scoot forward, dropping the heel for the sound.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Buffalo</span><span class="gloss-def">Shuffle, leap onto that foot, touch the other toe behind. Travels sideways.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Time step</span><span class="gloss-def">A standard 8-count phrase every tapper learns, used to set tempo. The single is stomp, hop, step, flap, ball change.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Pickup / pullback</span><span class="gloss-def">Hop backwards while the feet brush back underneath you. Comes later, worth knowing the name.</span></div>
+
+      <div class="gloss-group">Counting</div>
+      <div class="gloss-item"><span class="gloss-term">1 2 3 4</span><span class="gloss-def">The main beats, the ones you would clap on.</span></div>
+      <div class="gloss-item"><span class="gloss-term">&amp; (and)</span><span class="gloss-def">The exact halfway point between two beats.</span></div>
+      <div class="gloss-item"><span class="gloss-term">a</span><span class="gloss-def">A quick pickup sound squeezed in just <b>before</b> the beat, as in "a1" for a flap.</span></div>
+      <div class="gloss-item"><span class="gloss-term">1 e &amp; a</span><span class="gloss-def">One beat split into four even sounds. How a cramp roll is counted.</span></div>
+
+    </div>
+  </details>
 
   <div class="stats-row">
     <div class="stat"><div class="stat-label">Circuit</div><div class="stat-val" id="stat-circuit">1/3</div></div>
