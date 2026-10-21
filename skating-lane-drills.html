@@ -235,10 +235,10 @@
     </label>
   </div>
 
-  <div class="space-note">Built for a straight, clear <b>19ft × 5ft</b> lane on quads. Wall or counter should stay within reach for balance moves. Always leave a few feet of buffer at each end before turning around.</div>
+  <div class="space-note">Built for a straight, clear <b>15ft × 3ft</b> lane on quads. Wall or counter should stay within reach for balance moves. Always leave a few feet of buffer at each end before turning around.</div>
 
   <div class="lane-wrap">
-    <div class="lane-label"><span>YOUR LANE</span><span>0ft — 19ft</span></div>
+    <div class="lane-label"><span>YOUR LANE</span><span>0ft — 15ft</span></div>
     <div class="lane-track" id="lane-track">
       <div class="lane-marker" id="lane-marker"></div>
     </div>
@@ -290,14 +290,14 @@
 // travel: true = moves up/down the lane marker, false = stays centered (stationary move)
 const exercises = [
   { name:"Forward stride build-ups", tags:["cardio","travel"], travel:true,
-    tip:"Push down the full 19ft, gliding strides — not a sprint. Turn and reset at the wall, then go again.",
+    tip:"Push down the full 15ft, gliding strides — not a sprint. Turn and reset at the wall, then go again.",
     safety:"Slow down with 2–3ft to spare before the wall. Never rely on the wall to stop you." },
   { name:"T-stop reps", tags:["stop","skill"], travel:true,
     tip:"Build a little speed for a few feet, drag into a T-stop, roll to a stop, reset. Repeat down the lane.",
     safety:"Practice the stop early and slow before adding speed. Stay near the wall side for backup support." },
   { name:"Mini crossover steps", tags:["coord","hip","travel"], travel:true,
     tip:"Slow, controlled crossover mechanics — weight shift, cross, recover — moving gradually down the lane.",
-    safety:"Keep crossovers small and slow at first; width is tight, so don't reach wide." },
+    safety:"Keep crossovers small and slow at first; the lane is only 3ft wide, so keep each cross short." },
   { name:"Forward-to-backward transitions", tags:["skill","coord","travel"], travel:true,
     tip:"Build a little speed, pivot smoothly from forward to backward without losing your glide, then pivot back. Focus on carrying momentum through the turn rather than stopping to do it.",
     safety:"Walk through the pivot at a near-stop speed first. Stay near the wall until the turn feels smooth." },
@@ -316,9 +316,9 @@ const exercises = [
   { name:"Scissoring, left leg forward", tags:["coord","hip","travel"], travel:true,
     tip:"Glide with one foot forward and one back in a scissor stance, then switch. Extra reps with the left leg forward — that's the weaker pattern to build up.",
     safety:"Keep knees soft and weight centered between both skates. Don't let the front knee lock out." },
-  { name:"Tree pose + side stretch", tags:["stretch","balance"], travel:false,
-    tip:"Stationary at the end of the lane. Balance on your stronger leg, use the wall if needed, reach overhead and lean gently to stretch the side body.",
-    safety:"Hold the wall for this one if balance feels at all uncertain on wheels." },
+  { name:"Wide-stance side stretch", tags:["stretch"], travel:false,
+    tip:"Stationary at the end of the lane, both skates down a little wider than hips. Reach one arm overhead and lean gently to the opposite side. Switch at 30s.",
+    safety:"Keep knees soft and both skates loaded. Hold the wall with your free hand if you start to roll." },
 ];
 
 const tagColors = {
@@ -344,7 +344,7 @@ const WORK=60, REST=20, BREAK=60, CIRCUITS=4;
 let circuit=0, exIdx=0, phase="idle", remaining=WORK, totalElapsed=0;
 let timerInt=null, started=false;
 let audioCtx=null;
-let laneDir=1; // 1 = heading to 19ft end, -1 = heading back
+let laneDir=1; // 1 = heading to 15ft end, -1 = heading back
 
 function getAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
 

@@ -235,10 +235,10 @@
     </label>
   </div>
 
-  <div class="space-note">Built for a straight, clear <b>19ft × 5ft</b> lane on quads. Wall or counter should stay within reach for balance moves. Always leave a few feet of buffer at each end before turning around.</div>
+  <div class="space-note">Built for a straight, clear <b>15ft × 3ft</b> lane on quads. Wall or counter should stay within reach for balance moves. Always leave a few feet of buffer at each end before turning around.</div>
 
   <div class="lane-wrap">
-    <div class="lane-label"><span>YOUR LANE</span><span>0ft — 19ft</span></div>
+    <div class="lane-label"><span>YOUR LANE</span><span>0ft — 15ft</span></div>
     <div class="lane-track" id="lane-track">
       <div class="lane-marker" id="lane-marker"></div>
     </div>
@@ -291,7 +291,7 @@
 const exercises = [
   { name:"Mini crossover steps — back leg push", tags:["coord","hip","travel"], travel:true,
     tip:"Crossover mechanics down the lane, but the focus is the trailing leg — drive and push through it on every step, not just reach with the lead leg.",
-    safety:"Keep crossovers small and slow at first; width is tight, so don't reach wide." },
+    safety:"Keep crossovers small and slow at first; the lane is only 3ft wide, so keep each cross short." },
   { name:"Pivot transitions", tags:["skill","travel"], travel:true,
     tip:"Roll a few feet, plant and pivot a clean 180°, keep rolling the other direction. Repeat down the lane, alternating which foot leads the pivot.",
     safety:"Pivot at a slow, controlled speed — momentum control matters more than speed here. Stay near the wall for backup support." },
@@ -316,9 +316,9 @@ const exercises = [
   { name:"Deadlifts with weights", tags:["weights","hip"], travel:false,
     tip:"2 lb weights, standing still. Hip hinge — push hips back, flat back, squeeze glutes at the top.",
     safety:"Stable stance, weight centered over both skates before bending." },
-  { name:"Tree pose + side stretch", tags:["stretch","balance"], travel:false,
-    tip:"Stationary at the end of the lane. Balance on your stronger leg, use the wall if needed, reach overhead and lean gently to stretch the side body.",
-    safety:"Hold the wall for this one if balance feels at all uncertain on wheels." },
+  { name:"Wide-stance side stretch", tags:["stretch"], travel:false,
+    tip:"Stationary at the end of the lane, both skates down a little wider than hips. Reach one arm overhead and lean gently to the opposite side. Switch at 30s.",
+    safety:"Keep knees soft and both skates loaded. Hold the wall with your free hand if you start to roll." },
 ];
 
 const tagColors = {
@@ -345,7 +345,7 @@ const WORK=60, REST=20, BREAK=60, CIRCUITS=4;
 let circuit=0, exIdx=0, phase="idle", remaining=WORK, totalElapsed=0;
 let timerInt=null, started=false;
 let audioCtx=null;
-let laneDir=1; // 1 = heading to 19ft end, -1 = heading back
+let laneDir=1; // 1 = heading to 15ft end, -1 = heading back
 
 function getAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
 
