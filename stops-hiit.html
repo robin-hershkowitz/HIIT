@@ -170,22 +170,22 @@ const exercises = [
     tip:"Wide stance, toes turned in. Sit low and pulse while pressing your heels outward into the floor. Knees stay soft, chest up.",
     why:"Builds the hip internal rotation and inner-thigh push that powers a plow." },
   { name:"Towel T-stop drags", tags:["coord","hip"],
-    tip:"Stand on your left leg, right foot on a towel behind you at 90°. Slide it with steady pressure while staying low. Switch at 25s for the last 15s.",
+    tip:"Stand on your left leg, right foot on a towel behind you at 90°. Slide it with steady pressure while staying low. Switch at 35s for the last 25s.",
     why:"The closest off-skates rehearsal of the stop itself. Left standing leg gets the longer turn." },
   { name:"Sumo squat + bicep curl", tags:["weights","hip"],
     tip:"2 lb weights. Wide squat, toes slightly out. Curl at the bottom, stand and lower the weights. Knees track over toes.",
     why:"Quad and adductor strength for holding a deep, stable plow." },
   { name:"Side plank with top-leg lift", tags:["core","hip"],
-    tip:"Forearm side plank, knees down if needed. Lift the top leg slowly and lower with control. Switch sides at 20s.",
+    tip:"Forearm side plank, knees down if needed. Lift the top leg slowly and lower with control. Switch sides at 30s.",
     why:"Strengthens the glute med, which keeps your drag leg turned out and your hips from collapsing in a T-stop." },
   { name:"Dragon squats", tags:["hip","coord"],
-    tip:"Stand on your left leg, sweep your right leg behind and across, then sink as low as you control. Hold the counter if needed; partial depth is fine. Switch at 20s.",
+    tip:"Stand on your left leg, sweep your right leg behind and across, then sink as low as you control. Hold the counter if needed; partial depth is fine. Switch at 30s.",
     why:"Single-leg depth with the free leg behind you, the same shape and load as dropping into a T-stop." },
   { name:"90/90 hip switches", tags:["stretch","hip"],
     tip:"Sit with both knees bent at 90°, one in front and one to the side. Rotate both knees to the other side and back. Hands behind you for support.",
     why:"Opens internal rotation (plow) and external rotation (T-stop drag foot) in one move." },
   { name:"Single-leg deadlift", tags:["weights","hip"],
-    tip:"2 lb weight in the opposite hand. Left leg stands first. Hinge forward, back leg reaches long, hips stay square. Switch at 25s.",
+    tip:"2 lb weight in the opposite hand. Left leg stands first. Hinge forward, back leg reaches long, hips stay square. Switch at 35s.",
     why:"Balance and back-of-leg control on the standing leg." },
   { name:"Plank shoulder taps", tags:["core"],
     tip:"High plank, feet wide. Tap one shoulder, then the other, without letting your hips rock side to side.",
@@ -207,7 +207,7 @@ const tagLabel = { cardio:"Cardio", core:"Core", coord:"Coordination", hip:"Hip 
 
 const phaseColors = { work:"#d0d6e0", rest:"#f5a623", break:"#5ab4f5", idle:"#d0d6e0" };
 
-const WORK=40, REST=20, BREAK=60, CIRCUITS=3;
+const WORK=60, REST=20, BREAK=60, CIRCUITS=3;
 const N = exercises.length;
 let circuit=0, exIdx=0, phase="idle", remaining=WORK, totalElapsed=0;
 let timerInt=null, started=false, audioCtx=null;
