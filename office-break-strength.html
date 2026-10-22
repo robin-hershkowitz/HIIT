@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Office Break Strength</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e0f;
+    --surface: #1a1a1c;
+    --surface2: #242426;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8;
+    --muted: #7a7875;
+    --accent: #c4b5fd;
+    --accent-dim: rgba(196,181,253,0.12);
+    --accent-line: rgba(196,181,253,0.35);
+    --warn: #f5a623;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container { width: 100%; max-width: 560px; }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    gap: 12px;
+  }
+  .title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+  }
+  .title span { color: var(--accent); }
+  .subtitle { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; }
+
+  .sound-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--muted); cursor: pointer; user-select: none; white-space: nowrap;
+  }
+  .sound-toggle input { display: none; }
+  .toggle-pill {
+    width: 32px; height: 18px; background: var(--surface2); border-radius: 9px;
+    position: relative; border: 1px solid var(--border2); transition: background 0.2s;
+  }
+  .toggle-pill::after {
+    content: ''; position: absolute; left: 3px; top: 3px; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--muted); transition: left 0.2s, background 0.2s;
+  }
+  .sound-toggle input:checked + .toggle-pill { background: var(--accent-dim); border-color: var(--accent); }
+  .sound-toggle input:checked + .toggle-pill::after { left: 17px; background: var(--accent); }
+
+  .summary-bar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 0.75rem 1rem; display: flex; align-items: center; gap: 12px;
+  }
+  .stat-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .stat-val { font-size: 18px; font-weight: 500; }
+  .overall-wrap { flex: 1; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+  .overall-fill { height: 100%; width: 0; background: var(--accent); transition: width 0.3s; }
+
+  button {
+    font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
+    padding: 0.6rem 0.9rem; border-radius: 10px; border: 1px solid var(--border2);
+    background: var(--surface); color: var(--text); cursor: pointer; letter-spacing: 0.04em;
+    transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  button:hover { background: var(--surface2); border-color: rgba(255,255,255,0.2); }
+  button:active { transform: scale(0.97); }
+  .btn-clear { padding: 0.75rem 1.1rem; }
+
+  .section-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 2rem 0 0.9rem;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  }
+  .section-divider .line { flex: 1; height: 1px; background: var(--border2); }
+  .section-divider:first-of-type { margin-top: 0; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.1rem 1.2rem 1.2rem; margin-bottom: 10px; position: relative; overflow: hidden;
+    transition: border-color 0.2s, opacity 0.2s;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px; background: var(--accent);
+  }
+  .card.done { opacity: 0.55; }
+  .card.done .ex-name { text-decoration: line-through; text-decoration-color: var(--muted); }
+
+  .card-top { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 0.5rem; }
+  .check {
+    appearance: none; -webkit-appearance: none; flex-shrink: 0;
+    width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--border2);
+    background: var(--surface2); cursor: pointer; margin-top: 2px; position: relative; transition: all 0.15s;
+  }
+  .check:checked { background: var(--accent); border-color: var(--accent); }
+  .check:checked::after {
+    content: ''; position: absolute; left: 7px; top: 3px; width: 5px; height: 10px;
+    border: solid #0e0e0f; border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .ex-num { font-size: 11px; color: var(--muted); margin-right: 6px; }
+  .ex-name {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem;
+    letter-spacing: -0.01em; line-height: 1.3;
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0.4rem 0 0; }
+  .tag {
+    font-size: 10px; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.04em;
+    border: 1px solid var(--border2); color: var(--muted); background: var(--surface2);
+  }
+
+  .tip {
+    font-size: 12px; color: var(--muted); line-height: 1.6;
+    border-left: 2px solid var(--border2); padding-left: 10px; margin: 0.6rem 0 0.9rem 34px;
+  }
+
+  .timers { display: grid; gap: 8px; margin-left: 34px; }
+  .timers.two { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 460px) {
+    .timers.two { grid-template-columns: 1fr; }
+    .tip, .timers { margin-left: 0; }
+  }
+
+  .timer {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem 0.8rem;
+  }
+  .timer.running { border-color: var(--accent-line); }
+  .timer.finished { border-color: var(--accent); }
+  .timer-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem; }
+  .side-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .countdown {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem; line-height: 1; color: var(--accent);
+    transition: color 0.2s;
+  }
+  .countdown.warn { color: var(--warn); }
+  .bar { height: 3px; background: var(--bg); border-radius: 2px; overflow: hidden; margin-bottom: 0.6rem; }
+  .bar-fill { height: 100%; width: 100%; background: var(--accent); transition: width 0.5s linear; }
+  .timer-btns { display: grid; grid-template-columns: 2fr 1fr; gap: 6px; }
+  .btn-go { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .btn-go:hover { background: rgba(196,181,253,0.2); }
+
+  footer { margin-top: 2rem; font-size: 11px; color: var(--muted); text-align: center; line-height: 1.6; }
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#15120f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Derby.Fit">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<script src="app.js" defer></script>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="title">Office<span>.</span>break</div>
+    <label class="sound-toggle">
+      <input type="checkbox" id="sound-toggle" checked>
+      <span class="toggle-pill"></span>
+      <span id="sound-label">sound on</span>
+    </label>
+  </div>
+  <div class="subtitle">Pick any move, run its timer, check it off. Do them in any order, a few per break. Single-leg moves start on the left.</div>
+
+  <div class="summary-bar">
+    <div class="stat">
+      <span class="stat-label">Done</span>
+      <span class="stat-val" id="done-count">0/12</span>
+      <div class="overall-wrap"><div class="overall-fill" id="overall-fill"></div></div>
+    </div>
+    <button class="btn-clear" onclick="clearAll()">↺ &nbsp;Clear</button>
+  </div>
+
+  <div id="list"></div>
+
+  <footer>Checks stay saved in this browser until you hit Clear.</footer>
+</div>
+
+<script>
+const exercises = [
+  { section:"Door open", name:"Left-foot balance", tags:["coord"],
+    tip:"Stand tall on one foot, knee soft, eyes on a fixed point. Close your eyes to make it harder. This is your 30-second assessment balance.",
+    timers:[{label:"Left", secs:45},{label:"Right", secs:30}] },
+  { section:"Door open", name:"Single-leg calf raises", tags:["coord","strength"],
+    tip:"Fingertip on the desk. 3 seconds up, 3 seconds down. Builds the ankle push-off at the end of a crossover.",
+    timers:[{label:"Left", secs:40},{label:"Right", secs:40}] },
+  { section:"Door open", name:"Seated adductor squeeze", tags:["hip"],
+    tip:"Binder or rolled sweater between your knees. Squeeze hard for 10 seconds, relax briefly, repeat. Inner thighs pull your legs back together after a scissor or wide stance.",
+    timers:[{label:"Both", secs:60}] },
+  { section:"Door open", name:"Seated core brace", tags:["core"],
+    tip:"Sit tall, brace like you're about to take a hit, lift both feet an inch off the floor. Keep breathing.",
+    timers:[{label:"Hold", secs:30}] },
+
+  { section:"Door closed", name:"Wall sit", tags:["strength"],
+    tip:"Back flat on the wall, thighs as close to parallel as you can manage. This is getting lower, without skates.",
+    timers:[{label:"Hold", secs:45}] },
+  { section:"Door closed", name:"Split squat hold", tags:["strength","hip"],
+    tip:"Long split stance, sink until the back knee hovers. Weight stays centered, chest up. Left leg front first, matching your scissor goal.",
+    timers:[{label:"Left front", secs:30},{label:"Right front", secs:30}] },
+  { section:"Door closed", name:"Single-leg RDL to knee drive", tags:["strength","coord"],
+    tip:"Hinge forward on one leg like a seesaw, free leg reaching back. Stand up and drive that knee forward. Same motion as the back-leg push recovering under you.",
+    timers:[{label:"Left", secs:45},{label:"Right", secs:45}] },
+  { section:"Door closed", name:"Cossack squats", tags:["hip","strength"],
+    tip:"Wide stance. Shift into one deep side squat while the other leg stays straight, toes up. Alternate sides. Go only as deep as stays comfortable.",
+    timers:[{label:"Alternating", secs:60}] },
+  { section:"Door closed", name:"Derby stance weight shifts", tags:["coord","strength"],
+    tip:"Get into derby stance, low and stacked. Shift weight fully over the left foot, then the right, without popping up between.",
+    timers:[{label:"Continuous", secs:45}] },
+  { section:"Door closed", name:"Curtsy squats", tags:["hip","strength"],
+    tip:"Step back and across behind the front leg, then lower. Front knee tracks over toes. Alternate sides.",
+    timers:[{label:"Alternating", secs:60}] },
+  { section:"Door closed", name:"Fire hydrants + hip circles", tags:["hip"],
+    tip:"Hand on the desk, standing. Lift the bent knee out to the side, then draw slow circles both directions.",
+    timers:[{label:"Left", secs:45},{label:"Right", secs:45}] },
+  { section:"Door closed", name:"Desk push-ups", tags:["strength"],
+    tip:"Hands on the desk edge, body in a straight line from head to heels. Lower your chest to the desk, press away.",
+    timers:[{label:"Reps", secs:45}] },
+];
+
+const tagColors = {
+  core:     { bg:"rgba(90,180,245,0.12)",  color:"#5ab4f5", border:"rgba(90,180,245,0.3)"  },
+  coord:    { bg:"rgba(167,139,250,0.12)", color:"#a78bfa", border:"rgba(167,139,250,0.3)" },
+  hip:      { bg:"rgba(90,245,180,0.12)",  color:"#5af5b4", border:"rgba(90,245,180,0.3)"  },
+  strength: { bg:"rgba(245,166,35,0.12)",  color:"#f5a623", border:"rgba(245,166,35,0.3)"  },
+};
+const tagLabel = { core:"Core", coord:"Balance", hip:"Hip", strength:"Strength" };
+
+const STORE_KEY = "office-break-strength-checks";
+let checks = loadChecks();
+
+function loadChecks(){
+  try { const v = JSON.parse(localStorage.getItem(STORE_KEY)); return Array.isArray(v) ? v : []; }
+  catch(e){ return []; }
+}
+function saveChecks(){
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(checks)); } catch(e){}
+}
+
+// ── audio ──
+let audioCtx = null;
+function getAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+function beep(freq,dur,vol,delay){
+  try {
+    const ctx=getAudio(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type="sine"; o.frequency.value=freq;
+    const t=ctx.currentTime+delay;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.01);
+    g.gain.linearRampToValueAtTime(0,t+dur);
+    o.start(t); o.stop(t+dur+0.05);
+  } catch(e){}
+}
+function playSound(type){
+  if(!document.getElementById("sound-toggle").checked) return;
+  if(type==="start") { beep(880,0.12,0.3,0); beep(1100,0.18,0.3,0.15); }
+  if(type==="warn")  { beep(880,0.08,0.18,0); beep(880,0.08,0.18,0.15); beep(880,0.08,0.18,0.3); }
+  if(type==="done")  { [0,0.18,0.36].forEach((d,i)=>beep([880,1100,1320][i],0.2,0.28,d)); }
+}
+
+// ── timers ──
+const timerState = {}; // key "ex-t" → { total, remaining, interval }
+
+function tagsHtml(tags){
+  return tags.map(t=>{
+    const c=tagColors[t];
+    return `<span class="tag" style="background:${c.bg};color:${c.color};border-color:${c.border};">${tagLabel[t]}</span>`;
+  }).join("");
+}
+
+function render(){
+  const list = document.getElementById("list");
+  let html = "", lastSection = "";
+  exercises.forEach((ex,i)=>{
+    if(ex.section !== lastSection){
+      html += `<div class="section-divider"><span>${ex.section}</span><div class="line"></div></div>`;
+      lastSection = ex.section;
+    }
+    const timersHtml = ex.timers.map((t,j)=>{
+      const key = i+"-"+j;
+      timerState[key] = { total:t.secs, remaining:t.secs, interval:null };
+      return `
+        <div class="timer" id="timer-${key}">
+          <div class="timer-head">
+            <span class="side-label">${t.label}</span>
+            <span class="countdown" id="cd-${key}">${t.secs}</span>
+          </div>
+          <div class="bar"><div class="bar-fill" id="bar-${key}"></div></div>
+          <div class="timer-btns">
+            <button class="btn-go" id="go-${key}" onclick="toggleTimer('${key}')">▶ &nbsp;Start</button>
+            <button onclick="resetTimer('${key}')">↺</button>
+          </div>
+        </div>`;
+    }).join("");
+    html += `
+      <div class="card ${checks[i]?'done':''}" id="card-${i}">
+        <div class="card-top">
+          <input type="checkbox" class="check" id="check-${i}" ${checks[i]?'checked':''} onchange="setCheck(${i}, this.checked)" aria-label="Mark ${ex.name} done">
+          <div>
+            <div class="ex-name"><span class="ex-num">${i+1}</span>${ex.name}</div>
+            <div class="tags">${tagsHtml(ex.tags)}</div>
+          </div>
+        </div>
+        <div class="tip">${ex.tip}</div>
+        <div class="timers ${ex.timers.length===2?'two':''}">${timersHtml}</div>
+      </div>`;
+  });
+  list.innerHTML = html;
+  updateSummary();
+}
+
+function updateTimerUI(key){
+  const s = timerState[key];
+  const cd = document.getElementById("cd-"+key);
+  cd.textContent = s.remaining;
+  cd.classList.toggle("warn", s.remaining <= 3 && s.remaining > 0 && s.interval !== null);
+  document.getElementById("bar-"+key).style.width = (s.remaining / s.total * 100) + "%";
+  const box = document.getElementById("timer-"+key);
+  box.classList.toggle("running", s.interval !== null);
+  box.classList.toggle("finished", s.remaining === 0);
+  const go = document.getElementById("go-"+key);
+  if(s.interval !== null) go.innerHTML = "⏸ &nbsp;Pause";
+  else if(s.remaining === 0) go.innerHTML = "✓ &nbsp;Done";
+  else if(s.remaining < s.total) go.innerHTML = "▶ &nbsp;Resume";
+  else go.innerHTML = "▶ &nbsp;Start";
+}
+
+function pauseTimer(key){
+  const s = timerState[key];
+  if(s.interval !== null){ clearInterval(s.interval); s.interval = null; updateTimerUI(key); }
+}
+
+function toggleTimer(key){
+  const s = timerState[key];
+  if(s.interval !== null){ pauseTimer(key); return; }
+  // only one timer runs at a time
+  Object.keys(timerState).forEach(k=>{ if(k!==key) pauseTimer(k); });
+  if(s.remaining === 0) s.remaining = s.total;
+  playSound("start");
+  s.interval = setInterval(()=>{
+    s.remaining--;
+    if(s.remaining === 3) playSound("warn");
+    if(s.remaining <= 0){
+      s.remaining = 0;
+      clearInterval(s.interval); s.interval = null;
+      playSound("done");
+    }
+    updateTimerUI(key);
+  }, 1000);
+  updateTimerUI(key);
+}
+
+function resetTimer(key){
+  const s = timerState[key];
+  pauseTimer(key);
+  s.remaining = s.total;
+  updateTimerUI(key);
+}
+
+function setCheck(i, val){
+  checks[i] = val;
+  saveChecks();
+  document.getElementById("card-"+i).classList.toggle("done", val);
+  updateSummary();
+}
+
+function updateSummary(){
+  const n = exercises.filter((_,i)=>checks[i]).length;
+  document.getElementById("done-count").textContent = n + "/" + exercises.length;
+  document.getElementById("overall-fill").style.width = (n/exercises.length*100) + "%";
+}
+
+function clearAll(){
+  checks = [];
+  saveChecks();
+  exercises.forEach((_,i)=>{
+    document.getElementById("check-"+i).checked = false;
+    document.getElementById("card-"+i).classList.remove("done");
+  });
+  Object.keys(timerState).forEach(resetTimer);
+  updateSummary();
+}
+
+document.getElementById("sound-toggle").addEventListener("change", function(){
+  document.getElementById("sound-label").textContent = this.checked ? "sound on" : "sound off";
+});
+
+render();
+</script>
+</body>
+</html>
