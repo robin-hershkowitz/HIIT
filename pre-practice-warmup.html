@@ -49,6 +49,7 @@
   }
 
   .title span { color: var(--work); }
+  .subtitle { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; margin-top: 4px; }
 
   .sound-toggle {
     display: flex;
@@ -276,6 +277,12 @@
   }
   .done-screen p { color: var(--muted); font-size: 13px; margin-bottom: 1.5rem; }
   .done-screen button { margin: 0 auto; max-width: 260px; }
+  .checklist { text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: 1.5rem; }
+  .checklist-title { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--work); margin-bottom: 0.6rem; }
+  .checklist ul { list-style: none; }
+  .checklist li { font-size: 12px; color: var(--text); line-height: 1.5; padding: 6px 0 6px 18px; position: relative; border-bottom: 1px solid var(--border); }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before { content: '○'; position: absolute; left: 0; color: var(--work); }
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#15120f">
@@ -289,7 +296,7 @@
 <body>
 <div class="container">
   <div class="header">
-    <div class="title">Warmup<span>.</span>flow</div>
+    <div><div class="title">Warmup<span>.</span>flow</div><div class="subtitle">at home, before you go</div></div>
     <label class="sound-toggle">
       <input type="checkbox" id="sound-toggle" checked>
       <span class="toggle-pill"></span>
@@ -298,7 +305,7 @@
   </div>
 
   <div class="stats-row">
-    <div class="stat"><div class="stat-label">Move</div><div class="stat-val" id="stat-ex">1/5</div></div>
+    <div class="stat"><div class="stat-label">Move</div><div class="stat-val" id="stat-ex">1/7</div></div>
     <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-val" id="stat-time">0:00</div></div>
   </div>
 
@@ -332,11 +339,13 @@
 
 <script>
 const exercises = [
-  { name:"Ankle circles",              tags:["ankle"],  tip:"Both directions, extra time on the left ankle. Slow, full range of motion." },
-  { name:"Leg swings front-to-back",    tags:["hip"],    tip:"Hold a wall for balance. Swing each leg front-to-back, then switch. Let the range grow gradually." },
-  { name:"Walking lunges with a twist", tags:["hip","core"], tip:"Step into a lunge, rotate your torso toward the front leg, step through to the next lunge." },
+  { name:"Ankle circles",              tags:["ankle"],  tip:"Start with the left ankle. Both directions, extra time on the left. Slow, full range of motion." },
+  { name:"Leg swings front-to-back",    tags:["hip"], sw:true,    tip:"Hold a wall for balance. Left leg first, then switch at 1:00. Let the range grow gradually." },
+  { name:"Leg swings side-to-side",     tags:["hip"], sw:true,    tip:"Face the wall, hands on it. Swing the left leg across your body and out to the side, then switch at 1:00. Opens the inner thigh and outer hip for crossovers and scissoring." },
   { name:"Standing hip circles",        tags:["hip"],    tip:"Hands on hips, big controlled circles. Half the time each direction." },
-  { name:"Deep squat hold with reach",  tags:["ankle","hip"], tip:"Sink into a low squat, heels down. Reach one arm up and rotate open, then the other side." },
+  { name:"Walking lunges with a twist", tags:["hip","core"], tip:"Left leg leads first. Step into a lunge, rotate your torso toward the front leg, step through to the next lunge." },
+  { name:"Side lunges",                 tags:["hip"],    tip:"Slow and controlled. Step wide to the left, sit back into that hip, keep the other leg straight, then alternate. Same lateral range as an open step or crossover push." },
+  { name:"Deep squat hold with reach",  tags:["ankle","hip"], tip:"Sink into a low squat, heels down. Reach one arm up and rotate open, then the other side. Ends you in the low position you'll skate in." },
 ];
 
 const tagColors = {
@@ -346,7 +355,7 @@ const tagColors = {
 };
 const tagLabel = { ankle:"Ankle mobility", hip:"Hip mobility", core:"Core/rotation" };
 
-const WORK=120, TOTAL_MOVES=5;
+const WORK=120, TOTAL_MOVES=exercises.length;
 let exIdx=0, phase="idle", remaining=WORK, totalElapsed=0;
 let timerInt=null, started=false;
 let audioCtx=null;
@@ -369,6 +378,7 @@ function beep(freq,dur,vol,delay){
 function playSound(type){
   if(!document.getElementById("sound-toggle").checked) return;
   if(type==="next")  { beep(880,0.12,0.35,0); beep(1100,0.18,0.35,0.15); }
+  if(type==="switch"){ beep(660,0.12,0.3,0); beep(660,0.12,0.3,0.2); }
   if(type==="warn")  { beep(880,0.08,0.2,0); beep(880,0.08,0.2,0.15); beep(880,0.08,0.2,0.3); }
   if(type==="done")  { [0,0.18,0.36,0.56].forEach((d,i)=>beep([880,1100,1320,1760][i],0.2,0.3,d)); }
 }
@@ -419,7 +429,7 @@ function advance(){
   updateUI();
 }
 
-function tick(){ remaining--; totalElapsed++; if(remaining===5) playSound("warn"); if(remaining<=0) advance(); else updateUI(); }
+function tick(){ remaining--; totalElapsed++; if(exercises[exIdx].sw && remaining===60) playSound("switch"); if(remaining===5) playSound("warn"); if(remaining<=0) advance(); else updateUI(); }
 
 function endWorkout(){
   clearInterval(timerInt); playSound("done");
@@ -427,7 +437,17 @@ function endWorkout(){
     <div class="done-screen">
       <div class="trophy">✦</div>
       <h2>Warmup complete</h2>
-      <p>5 moves &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
+      <p>${exercises.length} moves &nbsp;·&nbsp; ${fmt(totalElapsed)} total</p>
+      <div class="checklist">
+        <div class="checklist-title">Before you go</div>
+        <ul>
+          <li>Stay on your feet when you can until you leave. Sitting for the whole gap stiffens hips back up.</li>
+          <li>Layer up your legs and hips for the drive.</li>
+          <li>Water bottle and gear bag check.</li>
+          <li>Small snack if you're hungry, nothing heavy.</li>
+          <li>First lap or two at practice: easy and low.</li>
+        </ul>
+      </div>
       <button onclick="location.reload()" style="max-width:200px;">↺ &nbsp;Start over</button>
     </div>`;
 }
