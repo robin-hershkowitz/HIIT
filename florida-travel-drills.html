@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Florida Travel Drills</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0e0f;--card:#17171a;--card2:#1e1e22;--line:#2a2a2f;--text:#ededed;--mut:#8b8b93;
+  --acc:#7ee8c0;--accdim:rgba(126,232,192,.14);--rest:#7aa7ff;--switch:#f0c14b;--ready:#c9c9cf;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:14px;line-height:1.45;padding:20px 14px 80px}
+.wrap{max-width:580px;margin:0 auto}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.5px;line-height:1.05}
+h1 span{color:var(--acc)}
+.sub{color:var(--mut);font-size:12px;margin-top:6px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.iconbtn{background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;cursor:pointer;white-space:nowrap}
+.iconbtn.off{color:var(--mut)}
+.label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);margin:22px 0 8px}
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dbtn{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 0 6px;text-align:center;cursor:pointer;color:var(--text);font-family:inherit;position:relative}
+.dbtn b{display:block;font-family:'Syne',sans-serif;font-size:15px}
+.dbtn small{font-size:10px;color:var(--mut)}
+.dbtn.sel{border-color:var(--acc);background:var(--accdim)}
+.dbtn.sel small{color:var(--acc)}
+.dbtn.done::after{content:'✓';position:absolute;top:2px;right:5px;font-size:10px;color:var(--acc)}
+.wkrow{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);margin:4px 2px 6px;letter-spacing:1px;text-transform:uppercase}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;background:none;border:none;color:var(--mut);font-family:inherit;font-size:12px;padding:9px 4px;border-radius:9px;cursor:pointer}
+.seg button.on{background:var(--acc);color:#111;font-weight:500}
+.seg button[hidden]{display:none}
+.banner{margin-top:12px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px}
+.banner summary{cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+.banner summary::after{content:'+';color:var(--acc)}
+.banner[open] summary::after{content:'–'}
+.banner ul{margin:10px 0 2px 16px;color:var(--mut);font-size:12.5px}
+.banner li{margin:4px 0}
+.banner li b{color:var(--text);font-weight:500}
+.daytitle{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;margin-top:24px}
+.daytitle small{display:block;font-family:'DM Mono',monospace;font-weight:400;font-size:12px;color:var(--mut);margin-top:2px}
+.note{font-size:12px;color:var(--mut);margin-top:6px}
+.sec{margin-top:26px}
+.sech{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:10px}
+.sech h2{font-family:'Syne',sans-serif;font-size:17px;font-weight:700}
+.sech span{font-size:11px;color:var(--mut)}
+.subh{font-size:11px;color:var(--acc);letter-spacing:1px;text-transform:uppercase;margin:14px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;transition:border-color .2s,opacity .2s}
+.card.active{border-color:var(--acc)}
+.card.checked{opacity:.55}
+.chead{display:flex;gap:10px;align-items:flex-start}
+.chk{flex:none;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line);background:none;cursor:pointer;color:#111;font-size:13px;margin-top:1px}
+.card.checked .chk{background:var(--acc);border-color:var(--acc)}
+.cname{font-family:'Syne',sans-serif;font-weight:700;font-size:15.5px;line-height:1.2}
+.rx{display:inline-block;margin-top:5px;font-size:12px;color:var(--acc)}
+.up{display:inline-block;margin-left:6px;font-size:10px;padding:1px 6px;border-radius:20px;background:var(--accdim);color:var(--acc);vertical-align:1px}
+.cue{color:var(--mut);font-size:12.5px;margin-top:6px}
+.cue b{color:var(--text);font-weight:500}
+.tbox{display:flex;align-items:center;gap:10px;margin-top:12px;background:var(--card2);border-radius:11px;padding:10px 12px}
+.tread{flex:1;min-width:0}
+.tnum{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.tlab{font-size:11px;color:var(--mut);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ph-work .tnum{color:var(--acc)}
+.ph-rest .tnum{color:var(--rest)}
+.ph-switch .tnum{color:var(--switch)}
+.ph-ready .tnum{color:var(--ready)}
+.bar{height:3px;background:var(--line);border-radius:3px;margin-top:7px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .25s linear}
+.ph-rest .bar i{background:var(--rest)}
+.ph-switch .bar i{background:var(--switch)}
+.dots{display:flex;gap:4px;margin-top:7px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.dots i.f{background:var(--acc)}
+.btn{background:var(--acc);color:#111;border:none;border-radius:10px;padding:10px 14px;font-family:inherit;font-weight:500;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.btn.ghost{background:none;color:var(--mut);border:1px solid var(--line);padding:10px 11px}
+.footer{margin-top:30px;display:flex;gap:10px;flex-wrap:wrap}
+.footer .btn{flex:1}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0e0e0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Derby.Fit">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<script src="app.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div>
+      <h1>Florida <span>Travel</span> Drills</h1>
+      <div class="sub">14 days · no skates · no tap shoes · ~30-35 min/day</div>
+    </div>
+    <button class="iconbtn" id="soundBtn">🔊 Sound</button>
+  </div>
+
+  <div class="label">Pick today</div>
+  <div class="wkrow"><span>Week 1</span></div>
+  <div class="strip" id="strip1"></div>
+  <div class="wkrow" style="margin-top:10px"><span>Week 2 · progressions on</span></div>
+  <div class="strip" id="strip2"></div>
+
+  <div class="label">View</div>
+  <div class="seg" id="weekSeg">
+    <button data-w="1">Week 1</button>
+    <button data-w="2">Week 2</button>
+  </div>
+  <div class="seg" id="daySeg" style="margin-top:8px">
+    <button data-d="A">Day A · Stops</button>
+    <button data-d="B">Day B · Footwork</button>
+    <button data-d="L">Light day</button>
+  </div>
+
+  <details class="banner" id="w2banner">
+    <summary>Week 2 progressions</summary>
+    <ul>
+      <li><b>Plow squat hold:</b> 30 sec → 45 sec</li>
+      <li><b>T-stop slide:</b> 3 sec press → 5 sec press</li>
+      <li><b>Balances:</b> eyes closed, or reach the free leg in different directions</li>
+      <li><b>Shuffles:</b> everything at tempo</li>
+      <li><b>Upper body:</b> 2 rounds → 3 rounds</li>
+      <li><b>Light day:</b> swap one in each week (warm-up, balance, cooldown)</li>
+    </ul>
+  </details>
+
+  <div id="content"></div>
+
+  <div class="footer">
+    <button class="btn" id="dayDone">Mark day complete</button>
+    <button class="btn ghost" id="clearBtn">Clear this day</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Data ---------- */
+const T=(id,n,c,o)=>({id,n,c,type:'time',...o});
+const R=(id,n,c,o)=>({id,n,c,type:'reps',...o});
+
+const WARMUP=[
+  T('wu1','March + hip & ankle circles','March in place, then circle your hips and each ankle in both directions.',{s:1,d:60,rx:'1 min'}),
+  T('wu2','Leg swings','Front-back, then side-side. Hold the wall. About 10 each direction.',{s:1,d:40,sides:1,rx:'40 sec each leg'}),
+  T('wu3','Derby stance bounce','Low stance, small bounces, chest up, weight over the balls of your feet.',{s:1,d:30,rx:'30 sec'})
+];
+
+const DAY_A=[
+  {sub:'Plow stop'},
+  T('a1','Plow squat hold','Feet wide, <b>toes turned in</b>, sit low. Press out through the inside edges of your feet, like you are shoving the floor apart.',{s:3,d:30,rest:20,rx:'3 × 30 sec',w2:{d:45,rx:'3 × 45 sec'}}),
+  R('a2','Towel plow slides','Towel under each foot. Slide out into a wide toes-in stance as you sink lower, then <b>squeeze back in with your inner thighs</b>.',{s:3,r:10,rx:'3 × 10'}),
+  T('a3','Bridge with pillow squeeze','On your back, knees bent, firm pillow or rolled towel between your knees. <b>Squeeze the pillow hard</b>, lift your hips, and hold while you keep squeezing. Same inner-thigh push as the plow, plus glutes.',{s:3,d:30,rest:20,rx:'3 × 20-30 sec'}),
+  {sub:'T-stop (right leg drags)'},
+  R('a4','Left-leg box squat','Stand on your <b>left leg only</b>, sit to the edge of a chair, stand back up. Knee tracks over toes.',{s:3,r:8,rx:'3 × 8 (left)'}),
+  R('a5','T-stop slide','Stand on your left leg, right foot on a towel behind you, turned out sideways. Slide back into a T as you bend your left knee, <b>press down 3 sec</b>, return.',{s:3,r:8,rx:'3 × 8',w2:{c:'Stand on your left leg, right foot on a towel behind you, turned out sideways. Slide back into a T as you bend your left knee, <b>press down 5 sec</b>, return.',rx:'3 × 8 · 5 sec press'}}),
+  R('a6','Clamshells, right side','Lie on your left side, knees bent. Open the right knee without rolling your hips back. Builds turnout for the drag foot.',{s:2,r:15,rx:'2 × 15 (right)'}),
+  T('a7','Left single-leg balance','Soft knee, gaze fixed on one point. Wall within reach.',{s:3,d:30,rest:15,rx:'3 × 30 sec (left)',w2:{c:'Soft knee. <b>Eyes closed</b>, or reach the free leg front, side and back. Wall within reach.',rx:'3 × 30 sec (left) · eyes closed / reach'}})
+];
+
+const DAY_B=[
+  {sub:'Shuffle weight shifts'},
+  R('b1','One-leg shuffles','8 shuffles on one foot without the working foot touching down, then switch. Standing knee stays soft.',{s:2,r:8,rx:'2 × 8 each foot',w2:{c:'8 shuffles on one foot without touching down, then switch. <b>At tempo</b>, standing knee soft.',rx:'2 × 8 each foot · at tempo'}}),
+  R('b2','Shuffle-step','Shuffle right, step right and take your <b>full weight</b>, then shuffle left. Sets 1-2 slow, set 3 at tempo.',{s:3,r:16,rx:'2 × 16 slow + 1 × 16 tempo',w2:{c:'Shuffle right, step right and take your <b>full weight</b>, then shuffle left. All sets at tempo.',rx:'3 × 16 · at tempo'}}),
+  R('b3','Shuffle ball change','Pause on every weight change and check it fully transferred before moving on.',{s:2,r:8,rx:'2 × 8 each side, slow',w2:{c:'Clean weight transfer on every change, now <b>at tempo</b>.',rx:'2 × 8 each side · at tempo'}}),
+  R('b4','Metronome shifts','Derby stance. Shift fully to one side until you can lift the other foot an inch, then go the other way.',{s:3,r:20,rx:'3 × 20'}),
+  {sub:'Sideways glides'},
+  R('b5','Lateral towel slides','Derby stance, towel under one foot. Push it out sideways, hold the glide, pull it back.',{s:3,r:10,rx:'3 × 10 each side'}),
+  R('b6','Low lateral lunge shift','Lunge to one side, shift through to the other <b>without standing up</b>.',{s:3,r:10,rx:'3 × 10'}),
+  T('b7','Low crab walk','Stay in stance, head level, feet never click together.',{s:3,d:30,rest:15,rx:'3 × 30 sec'})
+];
+
+const UPPER=[
+  R('u1','Bent-over rows','Hinge forward, flat back. Pull elbows past your ribs, squeeze shoulder blades.',{s:2,r:12,rx:'2 × 12',w2:{s:3,rx:'3 × 12'}}),
+  R('u2','Reverse flys','Hinged forward, soft elbows. Open arms wide to shoulder height.',{s:2,r:12,rx:'2 × 12',w2:{s:3,rx:'3 × 12'}}),
+  R('u3','Y-T-W raises','Bent over or lying face down. Lift into a Y, then T, then W. One of each = 1 rep.',{s:2,r:12,rx:'2 × 12',w2:{s:3,rx:'3 × 12'}}),
+  R('u4','Overhead press','Ribs down, press straight up, biceps by ears.',{s:2,r:12,rx:'2 × 12',w2:{s:3,rx:'3 × 12'}}),
+  R('u5','Tricep kickbacks','Hinged forward, upper arms glued to your sides. Straighten fully at the back.',{s:2,r:12,rx:'2 × 12',w2:{s:3,rx:'3 × 12'}}),
+  T('u6','Derby arm pumps','Low stance, pump the weights front-to-back like a sprint start.',{s:2,d:30,rest:15,rx:'2 × 30 sec',w2:{s:3,rx:'3 × 30 sec'}})
+];
+
+const COOL=[
+  T('c1','Kneeling hip flexor stretch','Back knee down, tuck your pelvis, lean forward gently.',{s:1,d:30,sides:1,rx:'30 sec each side'}),
+  T('c2','Adductor / frog stretch','Wide knees, rock hips back slowly.',{s:1,d:45,rx:'45 sec'}),
+  T('c3','Figure-4 or pigeon','Ankle over opposite knee, sink back.',{s:1,d:30,sides:1,rx:'30 sec each side'}),
+  T('c4','Thread the needle','On all fours, slide one arm under and rest your shoulder down.',{s:1,d:30,sides:1,rx:'30 sec each side'}),
+  T('c5','Doorway chest stretch','Forearm on the frame, step through gently.',{s:1,d:45,rx:'45 sec'})
+];
+
+const LIGHT_BAL=[DAY_A.find(x=>x.id==='a7'), DAY_B.find(x=>x.id==='b4')];
+
+/* ---------- State ---------- */
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let day=store.get('fl-day',1);
+let week=day<=7?1:2;
+let dtype=day%2?'A':'B';
+let sound=store.get('fl-sound',true);
+let checks=store.get('fl-checks',{});   // {dayNum:{exId:true}}
+let daysDone=store.get('fl-daysdone',{});
+let timers={};  // per exercise id
+let activeId=null, tickH=null, wakeLock=null;
+
+/* ---------- Audio ---------- */
+let actx=null;
+function beep(f=880,dur=.14,delay=0){
+  if(!sound)return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended')actx.resume();
+    const t=actx.currentTime+delay,o=actx.createOscillator(),g=actx.createGain();
+    o.frequency.value=f;o.type='sine';
+    g.gain.setValueAtTime(.22,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    o.connect(g).connect(actx.destination);o.start(t);o.stop(t+dur+.02);
+  }catch(e){}
+}
+const chime=()=>{beep(880);beep(1175,.18,.16)};
+const finish=()=>{beep(880);beep(1175,.14,.15);beep(1568,.25,.3)};
+
+async function lockScreen(){try{if('wakeLock' in navigator&&!wakeLock)wakeLock=await navigator.wakeLock.request('screen')}catch(e){}}
+function releaseLock(){try{wakeLock&&wakeLock.release()}catch(e){} wakeLock=null}
+
+/* ---------- Helpers ---------- */
+const eff=x=>(week===2&&x.w2)?{...x,...x.w2,up:true}:x;
+const fmt=s=>{s=Math.max(0,s);const m=Math.floor(s/60),r=s%60;return m?`${m}:${String(r).padStart(2,'0')}`:`${r}`};
+
+function buildSegs(e){
+  const out=[{k:'ready',d:5,label:'Get ready'}];
+  const sides=e.sides?['Left','Right']:[null];
+  for(let i=0;i<e.s;i++){
+    sides.forEach((sd,j)=>{
+      out.push({k:'work',d:e.d,label:(e.s>1?`Set ${i+1}/${e.s}`:'Go')+(sd?` · ${sd}`:'')});
+      const last=i===e.s-1&&j===sides.length-1;
+      if(!last){
+        const sw=j<sides.length-1;
+        out.push({k:sw?'switch':'rest',d:sw?5:(e.rest||15),label:sw?'Switch sides':'Rest'});
+      }
+    });
+  }
+  return out;
+}
+
+function sections(){
+  if(dtype==='L') return [
+    {t:'Warm-up',m:'5 min',items:WARMUP},
+    {t:'Balance',m:'Light day',items:LIGHT_BAL},
+    {t:'Cooldown',m:'5 min',items:COOL}
+  ];
+  return [
+    {t:'Warm-up',m:'5 min',items:WARMUP},
+    dtype==='A'?{t:'Day A · Stops',m:'~12 min',items:DAY_A}:{t:'Day B · Footwork & glides',m:'~12 min',items:DAY_B},
+    {t:'Upper body · 2 lb',m:week===2?'3 rounds':'2 rounds',items:UPPER},
+    {t:'Cooldown',m:'5 min',items:COOL}
+  ];
+}
+
+/* ---------- Render ---------- */
+function renderStrips(){
+  ['strip1','strip2'].forEach((sid,w)=>{
+    const el=document.getElementById(sid);el.innerHTML='';
+    for(let i=1;i<=7;i++){
+      const n=w*7+i,b=document.createElement('button');
+      b.className='dbtn'+(n===day?' sel':'')+(daysDone[n]?' done':'');
+      b.innerHTML=`<b>${n}</b><small>Day ${n%2?'A':'B'}</small>`;
+      b.onclick=()=>{stopActive();day=n;week=n<=7?1:2;dtype=n%2?'A':'B';store.set('fl-day',day);renderAll()};
+      el.appendChild(b);
+    }
+  });
+}
+
+function renderAll(){
+  stopActive();timers={};
+  renderStrips();
+  document.querySelectorAll('#weekSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.w===week));
+  const lb=document.querySelector('#daySeg [data-d="L"]');lb.hidden=week!==2;
+  if(week!==2&&dtype==='L')dtype=day%2?'A':'B';
+  document.querySelectorAll('#daySeg button').forEach(b=>b.classList.toggle('on',b.dataset.d===dtype));
+  document.getElementById('w2banner').open=week===2;
+
+  const c=document.getElementById('content');
+  const title=dtype==='A'?'Day A · Stops':dtype==='B'?'Day B · Footwork & glides':'Light day';
+  let h=`<div class="daytitle">Day ${day} · ${title}<small>Week ${week}${week===2?' · progressions marked Wk 2 ↑':''}</small></div>`;
+  if(dtype==='L')h+=`<div class="note">Swap this in for one day this week when your body needs it.</div>`;
+  h+=`<div class="note">Towels or socks work as sliders on tile or hardwood; paper plates on carpet. Keep a wall or counter close.</div>`;
+  sections().forEach(s=>{
+    h+=`<div class="sec"><div class="sech"><h2>${s.t}</h2><span>${s.m}</span></div>`;
+    s.items.forEach(raw=>{
+      if(raw.sub){h+=`<div class="subh">${raw.sub}</div>`;return}
+      h+=cardHTML(eff(raw));
+    });
+    h+='</div>';
+  });
+  c.innerHTML=h;
+  bindCards();
+  document.getElementById('dayDone').textContent=daysDone[day]?'Day complete ✓':'Mark day complete';
+}
+
+function cardHTML(e){
+  const ck=checks[day]&&checks[day][e.id];
+  const isTime=e.type==='time';
+  return `<div class="card${ck?' checked':''}" id="card-${e.id}" data-id="${e.id}">
+    <div class="chead">
+      <button class="chk" data-chk="${e.id}" aria-label="Mark done">${ck?'✓':''}</button>
+      <div>
+        <div class="cname">${e.n}${e.up?'<span class="up">Wk 2 ↑</span>':''}</div>
+        <div class="rx">${e.rx}</div>
+        <div class="cue">${e.c}</div>
+      </div>
+    </div>
+    <div class="tbox ${isTime?'ph-ready':'ph-work'}" id="tb-${e.id}">
+      <div class="tread">
+        <div class="tnum" id="tn-${e.id}">${isTime?fmt(e.d):`Set 1/${e.s}`}</div>
+        <div class="tlab" id="tl-${e.id}">${isTime?(e.sides?'Per side':'Tap start'):`${e.r} reps · tap when the set is done`}</div>
+        ${isTime?`<div class="bar"><i id="tbar-${e.id}"></i></div>`:`<div class="dots" id="td-${e.id}">${'<i></i>'.repeat(e.s)}</div>`}
+      </div>
+      <button class="btn" id="tgo-${e.id}">${isTime?'Start':'Set done'}</button>
+      <button class="btn ghost" id="trs-${e.id}">↺</button>
+    </div>
+  </div>`;
+}
+
+function allItems(){const m={};sections().forEach(s=>s.items.forEach(x=>{if(!x.sub)m[x.id]=eff(x)}));return m}
+
+function bindCards(){
+  const items=allItems();
+  Object.values(items).forEach(e=>{
+    document.querySelector(`[data-chk="${e.id}"]`).onclick=()=>setCheck(e.id,!(checks[day]&&checks[day][e.id]));
+    document.getElementById(`tgo-${e.id}`).onclick=()=>{
+      if(actx===null)beep(1,0.001); // unlock audio on first tap
+      e.type==='time'?toggleTime(e):repDone(e);
+    };
+    document.getElementById(`trs-${e.id}`).onclick=()=>resetCard(e);
+  });
+}
+
+function setCheck(id,v){
+  checks[day]=checks[day]||{};
+  if(v)checks[day][id]=true;else delete checks[day][id];
+  store.set('fl-checks',checks);
+  const card=document.getElementById('card-'+id);
+  if(card){card.classList.toggle('checked',v);card.querySelector('.chk').textContent=v?'✓':''}
+}
+
+/* ---------- Timed exercises ---------- */
+function toggleTime(e){
+  let t=timers[e.id];
+  if(t&&t.running){pause(e.id);return}
+  if(activeId&&activeId!==e.id)stopActive();
+  if(!t||t.finished){t=timers[e.id]={segs:buildSegs(e),i:0,left:null,running:false,finished:false}}
+  if(t.left===null)t.left=t.segs[t.i].d;
+  t.endAt=Date.now()+t.left*1000;t.running=true;t.lastBeep=null;
+  activeId=e.id;lockScreen();
+  document.getElementById('card-'+e.id).classList.add('active');
+  document.getElementById('tgo-'+e.id).textContent='Pause';
+  clearInterval(tickH);tickH=setInterval(()=>tick(e),200);tick(e);
+}
+function tick(e){
+  const t=timers[e.id];if(!t||!t.running)return;
+  const seg=t.segs[t.i];
+  const left=Math.ceil((t.endAt-Date.now())/1000);
+  t.left=left;
+  if(left<=3&&left>0&&t.lastBeep!==left){t.lastBeep=left;beep(660,.09)}
+  if(left<=0){
+    t.i++;
+    if(t.i>=t.segs.length){completeTime(e);return}
+    const nx=t.segs[t.i];
+    nx.k==='work'?chime():beep(520,.2);
+    t.left=nx.d;t.endAt=Date.now()+nx.d*1000;t.lastBeep=null;
+  }
+  drawTime(e);
+}
+function drawTime(e){
+  const t=timers[e.id],seg=t.segs[t.i];
+  const tb=document.getElementById('tb-'+e.id);if(!tb)return;
+  tb.className='tbox ph-'+seg.k;
+  document.getElementById('tn-'+e.id).textContent=fmt(t.left);
+  const next=t.segs[t.i+1];
+  document.getElementById('tl-'+e.id).textContent=seg.label+(next&&seg.k!=='work'?` → ${next.label}`:'');
+  document.getElementById('tbar-'+e.id).style.width=(100*(1-t.left/seg.d))+'%';
+}
+function pause(id){
+  const t=timers[id];if(!t)return;
+  t.left=Math.max(0,Math.ceil((t.endAt-Date.now())/1000));t.running=false;
+  clearInterval(tickH);
+  const b=document.getElementById('tgo-'+id);if(b)b.textContent='Resume';
+}
+function completeTime(e){
+  const t=timers[e.id];t.running=false;t.finished=true;clearInterval(tickH);
+  finish();activeId=null;releaseLock();
+  const tb=document.getElementById('tb-'+e.id);tb.className='tbox ph-work';
+  document.getElementById('tn-'+e.id).textContent='Done';
+  document.getElementById('tl-'+e.id).textContent='Nice work';
+  document.getElementById('tbar-'+e.id).style.width='100%';
+  document.getElementById('tgo-'+e.id).textContent='Again';
+  document.getElementById('card-'+e.id).classList.remove('active');
+  setCheck(e.id,true);
+}
+
+/* ---------- Rep exercises (set tracker + rest timer) ---------- */
+function repDone(e){
+  let t=timers[e.id]||(timers[e.id]={done:0,resting:false});
+  if(t.resting){endRest(e,true);return}
+  if(t.done>=e.s){resetCard(e);return}
+  if(activeId&&activeId!==e.id)stopActive();
+  t.done++;drawDots(e);
+  if(t.done>=e.s){
+    finish();
+    document.getElementById('tn-'+e.id).textContent='Done';
+    document.getElementById('tl-'+e.id).textContent='All sets complete';
+    document.getElementById('tgo-'+e.id).textContent='Again';
+    setCheck(e.id,true);return;
+  }
+  // start rest
+  t.resting=true;t.endAt=Date.now()+(e.rest||30)*1000;t.lastBeep=null;activeId=e.id;lockScreen();
+  document.getElementById('card-'+e.id).classList.add('active');
+  document.getElementById('tb-'+e.id).className='tbox ph-rest';
+  document.getElementById('tgo-'+e.id).textContent='Skip rest';
+  clearInterval(tickH);tickH=setInterval(()=>restTick(e),200);restTick(e);
+}
+function restTick(e){
+  const t=timers[e.id];if(!t||!t.resting)return;
+  const left=Math.ceil((t.endAt-Date.now())/1000);
+  if(left<=3&&left>0&&t.lastBeep!==left){t.lastBeep=left;beep(660,.09)}
+  if(left<=0){endRest(e,false);return}
+  document.getElementById('tn-'+e.id).textContent=fmt(left);
+  document.getElementById('tl-'+e.id).textContent=`Rest → Set ${t.done+1}/${e.s}`;
+}
+function endRest(e,skipped){
+  const t=timers[e.id];t.resting=false;clearInterval(tickH);activeId=null;
+  if(!skipped)chime();
+  const tb=document.getElementById('tb-'+e.id);if(!tb)return;
+  tb.className='tbox ph-work';
+  document.getElementById('tn-'+e.id).textContent=`Set ${t.done+1}/${e.s}`;
+  document.getElementById('tl-'+e.id).textContent=`${e.r} reps · tap when the set is done`;
+  document.getElementById('tgo-'+e.id).textContent='Set done';
+  document.getElementById('card-'+e.id).classList.remove('active');
+}
+function drawDots(e){
+  const t=timers[e.id];
+  document.querySelectorAll(`#td-${e.id} i`).forEach((d,i)=>d.classList.toggle('f',i<t.done));
+}
+
+/* ---------- Shared ---------- */
+function stopActive(){
+  if(!activeId)return;
+  const id=activeId,t=timers[id];
+  if(t){ if(t.running)pause(id); if(t.resting){t.resting=false;clearInterval(tickH);const items=allItems();if(items[id])endRest(items[id],true)} }
+  const card=document.getElementById('card-'+id);if(card)card.classList.remove('active');
+  activeId=null;clearInterval(tickH);releaseLock();
+}
+function resetCard(e){
+  if(activeId===e.id){clearInterval(tickH);activeId=null;releaseLock()}
+  delete timers[e.id];
+  const card=document.getElementById('card-'+e.id);
+  const ck=checks[day]&&checks[day][e.id];
+  const tmp=document.createElement('div');tmp.innerHTML=cardHTML(e);
+  card.replaceWith(tmp.firstElementChild);
+  const items={};items[e.id]=e;
+  document.querySelector(`[data-chk="${e.id}"]`).onclick=()=>setCheck(e.id,!(checks[day]&&checks[day][e.id]));
+  document.getElementById(`tgo-${e.id}`).onclick=()=>e.type==='time'?toggleTime(e):repDone(e);
+  document.getElementById(`trs-${e.id}`).onclick=()=>resetCard(e);
+}
+
+/* ---------- Controls ---------- */
+document.querySelectorAll('#weekSeg button').forEach(b=>b.onclick=()=>{week=+b.dataset.w;renderAll()});
+document.querySelectorAll('#daySeg button').forEach(b=>b.onclick=()=>{dtype=b.dataset.d;renderAll()});
+const sb=document.getElementById('soundBtn');
+function drawSound(){sb.textContent=sound?'🔊 Sound':'🔇 Muted';sb.classList.toggle('off',!sound)}
+sb.onclick=()=>{sound=!sound;store.set('fl-sound',sound);drawSound();if(sound)beep(880)};
+document.getElementById('dayDone').onclick=()=>{daysDone[day]=!daysDone[day];store.set('fl-daysdone',daysDone);renderStrips();document.getElementById('dayDone').textContent=daysDone[day]?'Day complete ✓':'Mark day complete'};
+document.getElementById('clearBtn').onclick=()=>{delete checks[day];delete daysDone[day];store.set('fl-checks',checks);store.set('fl-daysdone',daysDone);renderAll()};
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&activeId)lockScreen()});
+
+drawSound();renderAll();
+</script>
+</body>
+</html>
