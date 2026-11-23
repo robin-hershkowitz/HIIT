@@ -141,7 +141,9 @@ const T=(id,n,c,o)=>({id,n,c,type:'time',...o});
 const R=(id,n,c,o)=>({id,n,c,type:'reps',...o});
 
 const WARMUP=[
-  T('wu1','March + hip & ankle circles','March in place, then circle your hips and each ankle in both directions.',{s:1,d:60,rx:'1 min'}),
+  T('wu1','March + hip circles','March in place, then circle your hips in both directions.',{s:1,d:60,rx:'1 min'}),
+  T('wu4','Ankle circles','Lift one foot and draw slow, full circles with your toes, both directions. Hold the wall.',{s:1,d:30,sides:1,rx:'30 sec each foot'}),
+  R('wu5','Calf raises','Rise onto the balls of your feet, pause, lower <b>slowly</b> (3 sec down). Weight over the big toe, not rolling out. Builds the ankle strength tap runs on.',{s:2,r:15,rest:20,rx:'2 × 15'}),
   T('wu2','Leg swings','Front-back, then side-side. Hold the wall. About 10 each direction.',{s:1,d:40,sides:1,rx:'40 sec each leg'}),
   T('wu3','Derby stance bounce','Low stance, small bounces, chest up, weight over the balls of your feet.',{s:1,d:30,rx:'30 sec'})
 ];
@@ -241,12 +243,12 @@ function buildSegs(e){
 
 function sections(){
   if(dtype==='L') return [
-    {t:'Warm-up',m:'5 min',items:WARMUP},
+    {t:'Warm-up',m:'~7 min',items:WARMUP},
     {t:'Balance',m:'Light day',items:LIGHT_BAL},
     {t:'Cooldown',m:'5 min',items:COOL}
   ];
   return [
-    {t:'Warm-up',m:'5 min',items:WARMUP},
+    {t:'Warm-up',m:'~7 min',items:WARMUP},
     dtype==='A'?{t:'Day A · Stops',m:'~12 min',items:DAY_A}:{t:'Day B · Footwork & glides',m:'~12 min',items:DAY_B},
     {t:'Upper body · 2 lb',m:week===2?'3 rounds':'2 rounds',items:UPPER},
     {t:'Cooldown',m:'5 min',items:COOL}
