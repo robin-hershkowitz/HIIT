@@ -76,6 +76,7 @@ h1 span{color:var(--acc)}
 .dots i.f{background:var(--acc)}
 .btn{background:var(--acc);color:#111;border:none;border-radius:10px;padding:10px 14px;font-family:inherit;font-weight:500;font-size:12.5px;cursor:pointer;white-space:nowrap}
 .btn.ghost{background:none;color:var(--mut);border:1px solid var(--line);padding:10px 11px}
+.vid{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--acc);text-decoration:none;border:1px solid var(--acc);border-radius:8px;padding:5px 10px}
 .footer{margin-top:30px;display:flex;gap:10px;flex-wrap:wrap}
 .footer .btn{flex:1}
 </style>
@@ -189,6 +190,10 @@ const COOL=[
   T('c5','Doorway chest stretch','Forearm on the frame, step through gently.',{s:1,d:45,rx:'45 sec'})
 ];
 
+const COMBO=[
+  T('cb1','Combo run-through','Watch it once, then run it with the video, then without. No tap shoes: sneakers on a smooth floor, or just mark the steps and say the sounds out loud. Keep your weight changes clean.',{s:1,d:300,rx:'5 min',link:'https://drive.google.com/drive/folders/1Ziz5leG9fS0nT2oawrWiG5A5EGIq7QOk'})
+];
+
 const LIGHT_BAL=[DAY_A.find(x=>x.id==='a7'), DAY_B.find(x=>x.id==='b4')];
 
 /* ---------- State ---------- */
@@ -245,11 +250,13 @@ function sections(){
   if(dtype==='L') return [
     {t:'Warm-up',m:'~7 min',items:WARMUP},
     {t:'Balance',m:'Light day',items:LIGHT_BAL},
+    {t:'Tap combo',m:'5 min',items:COMBO},
     {t:'Cooldown',m:'5 min',items:COOL}
   ];
   return [
     {t:'Warm-up',m:'~7 min',items:WARMUP},
     dtype==='A'?{t:'Day A · Stops',m:'~12 min',items:DAY_A}:{t:'Day B · Footwork & glides',m:'~12 min',items:DAY_B},
+    {t:'Tap combo',m:'5 min',items:COMBO},
     {t:'Upper body · 2 lb',m:week===2?'3 rounds':'2 rounds',items:UPPER},
     {t:'Cooldown',m:'5 min',items:COOL}
   ];
@@ -306,6 +313,7 @@ function cardHTML(e){
         <div class="cname">${e.n}${e.up?'<span class="up">Wk 2 ↑</span>':''}</div>
         <div class="rx">${e.rx}</div>
         <div class="cue">${e.c}</div>
+        ${e.link?`<a class="vid" href="${e.link}" target="_blank" rel="noopener">▶ Open combo video</a>`:''}
       </div>
     </div>
     <div class="tbox ${isTime?'ph-ready':'ph-work'}" id="tb-${e.id}">
